@@ -1,0 +1,5 @@
+# Ignore everything
+*
+
+# Include the base-app directory
+!base-app/**
