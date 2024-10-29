@@ -1,7 +1,10 @@
 {
-  "name": "createmyapp",
+  "name": "@bob-zs/createmyapp",
   "version": "0.0.1",
   "main": "setup.js",
+  "bin": {
+    "create-my-app": "setup.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
