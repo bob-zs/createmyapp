@@ -1,6 +1,6 @@
 {
   "name": "@bob-zs/createmyapp",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "main": "setup.js",
   "bin": {
     "create-my-app": "setup.js"
