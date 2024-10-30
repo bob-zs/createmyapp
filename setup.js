@@ -28,10 +28,19 @@ fs.mkdirSync(appName);
 
 const copyRecursiveSync = (src, dest) => {
   const entries = fs.readdirSync(src, { withFileTypes: true });
+  console.log(`Copying from ${src} to ${dest}`);
+  if (!fs.existsSync(dest)) {
+    fs.mkdirSync(dest);
+  }
   for (let entry of entries) {
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
+    console.log(`Copying ${srcPath} to ${destPath}`);
     if (entry.name !== scriptName) {
+      if (!fs.existsSync(srcPath)) {
+        console.log(`File not found: ${srcPath}`);
+        continue;
+      }
       entry.isDirectory() ? copyRecursiveSync(srcPath, destPath) : fs.copyFileSync(srcPath, destPath);
     }
   }
