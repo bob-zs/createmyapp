@@ -51,5 +51,9 @@ copyRecursiveSync(baseAppDir, appName);
 process.chdir(appName);
 
 runCommand('pnpm install');
+runCommand('pnpm exec webpack --mode="development"');
+runCommand('cd ..');
 
 console.log('Express app setup complete with custom configurations!');
+console.log('run the following command to start the server:');
+console.log('cd', appName, '&& pnpm start');
