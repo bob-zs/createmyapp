@@ -7,6 +7,12 @@ const path = require('path');
 const baseAppDir = path.join(__dirname, 'base-app');
 const scriptName = path.basename(process.argv[1]);
 
+const appName = process.argv[2] || 'my-app';
+if (fs.existsSync(appName)) {
+  console.error(`Error: Directory "${appName}" already exists. Please choose a different name.`);
+  process.exit(1);
+}
+
 const runCommand = command => {
   execSync(command, { stdio: 'inherit' });
 };
@@ -16,12 +22,6 @@ try {
 } catch (e) {
   console.log('pnpm not found. Installing pnpm...');
   runCommand('npm install -g pnpm@9.12.3');
-}
-
-const appName = process.argv[2] || 'my-app';
-if (fs.existsSync(appName)) {
-  console.error(`Error: Directory "${appName}" already exists. Please choose a different name.`);
-  process.exit(1);
 }
 
 fs.mkdirSync(appName);
