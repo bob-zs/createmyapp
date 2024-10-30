@@ -54,6 +54,10 @@ runCommand('pnpm install');
 runCommand('pnpm exec webpack --mode="development"');
 runCommand('cd ..');
 
-console.log('Express app setup complete with custom configurations!');
-console.log('run the following command to start the server:');
-console.log('cd', appName, '&& pnpm start');
+function printEndingMessage() {
+  console.log('\n\n')
+  console.log('Express app setup complete with custom configurations!');
+  console.log('run the following command to start the server:\n');
+  console.log('cd', appName, '&& pnpm start\n');
+}
+printEndingMessage();
