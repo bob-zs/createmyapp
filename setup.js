@@ -3,12 +3,13 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const chalk = require('chalk');
+
+// Read package.json to get the version
+const packageJson = require('./package.json');
+const version = packageJson.version;
 
 // Check for --version flag
 if (process.argv.includes('--version')) {
-  const packageJson = require('./package.json');
-  const version = packageJson.version;
   console.log(`create-my-app version: ${version}`);
   process.exit(0);
 }
@@ -62,7 +63,8 @@ runCommand('pnpm install');
 runCommand('pnpm exec webpack --mode="development"');
 runCommand('cd ..');
 
-function printEndingMessage() {
+async function printEndingMessage() {
+  const { default: chalk } = await import('chalk');
   console.log('\n\n');
   console.log(chalk.green('Express app setup complete with custom configurations!'));
   console.log(chalk.yellow('Run the following command to start the server:\n'));
