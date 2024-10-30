@@ -49,7 +49,7 @@ const copyRecursiveSync = (src, dest) => {
   for (let entry of entries) {
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
-    if (entry.name !== scriptName) {
+    if (entry.name !== scriptName && entry.name !== '.git') {
       if (!fs.existsSync(srcPath)) {
         console.log(`File not found: ${srcPath}`);
         continue;
@@ -65,7 +65,11 @@ copyRecursiveSync(baseAppDir, appName);
 process.chdir(appName);
 runCommand('pnpm install');
 runCommand('pnpm exec webpack --mode="development"');
-runCommand('cd ..');
+
+// Initialize a fresh Git repository
+runCommand('git init');
+runCommand('git add .');
+runCommand('git commit -m "Initial commit from create-my-app"');
 
 function printEndingMessage() {
   console.log('\n\n');
