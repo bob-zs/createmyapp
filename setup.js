@@ -3,7 +3,11 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const chalk = require('chalk');
+
+// ANSI escape codes for coloring text
+const green = text => `\x1b[32m${text}\x1b[0m`;
+const yellow = text => `\x1b[33m${text}\x1b[0m`;
+const blue = text => `\x1b[34m${text}\x1b[0m`;
 
 // Read package.json to get the version
 const packageJson = require('./package.json');
@@ -63,12 +67,11 @@ runCommand('pnpm install');
 runCommand('pnpm exec webpack --mode="development"');
 runCommand('cd ..');
 
-async function printEndingMessage() {
-  const { default: chalk } = await import('chalk');
+function printEndingMessage() {
   console.log('\n\n');
-  console.log(chalk.green('Express app setup complete with custom configurations!'));
-  console.log(chalk.yellow('Run the following command to start the server:\n'));
-  console.log(chalk.blue(`cd ${appName} && pnpm start\n`));
+  console.log(green('Express app setup complete with custom configurations!'));
+  console.log(yellow('Run the following command to start the server:\n'));
+  console.log(blue(`cd ${appName} && pnpm start\n`));
 }
 
 printEndingMessage();
