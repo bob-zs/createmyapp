@@ -3,6 +3,7 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const chalk = require('chalk');
 
 const baseAppDir = path.join(__dirname, 'base-app');
 const scriptName = path.basename(process.argv[1]);
@@ -55,9 +56,10 @@ runCommand('pnpm exec webpack --mode="development"');
 runCommand('cd ..');
 
 function printEndingMessage() {
-  console.log('\n\n')
-  console.log('Express app setup complete with custom configurations!');
-  console.log('run the following command to start the server:\n');
-  console.log('cd', appName, '&& pnpm start\n');
+  console.log('\n\n');
+  console.log(chalk.green('Express app setup complete with custom configurations!'));
+  console.log(chalk.yellow('Run the following command to start the server:\n'));
+  console.log(chalk.blue(`cd ${appName} && pnpm start\n`));
 }
+
 printEndingMessage();
