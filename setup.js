@@ -10,7 +10,7 @@ import { fileURLToPath } from 'url';
 
 const program = new Command();
 
-// Define __dirname for ES modules
+// Define __filename and __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -41,15 +41,9 @@ if (fs.existsSync(appName)) {
   process.exit(1);
 }
 
-const runCommand = command => {
+const announceCommand = (command) => {
+  console.log(chalk.cyan(`Running: ${command}`));
   execSync(command, { stdio: 'inherit' });
-};
-
-// Default ignores inspired by .gitignore and .npmignore
-const defaultIgnores = ['.git', 'node_modules', 'dist', '*.log', 'coverage', 'temp'];
-
-const shouldIgnore = (name) => {
-  return defaultIgnores.some(ignore => name === ignore || name.startsWith(ignore.replace('*', '')));
 };
 
 (async () => {
@@ -61,10 +55,10 @@ const shouldIgnore = (name) => {
   });
 
   try {
-    execSync(`${packageManager} --version`, { stdio: 'ignore' });
+    announceCommand(`${packageManager} --version`);
   } catch (e) {
     console.log(`${packageManager} not found. Installing ${packageManager}...`);
-    runCommand(`npm install -g ${packageManager}`);
+    announceCommand(`npm install -g ${packageManager}`);
   }
 
   fs.mkdirSync(appName);
@@ -99,15 +93,15 @@ const shouldIgnore = (name) => {
     if (fs.existsSync(path.join(baseAppDir, 'package-lock.json'))) fs.unlinkSync(path.join(baseAppDir, 'package-lock.json'));
   }
 
-  runCommand(`${packageManager} install`);
-  runCommand(`${packageManager} exec webpack --mode="development"`);
+  announceCommand(`${packageManager} install`);
+  announceCommand(`${packageManager} exec webpack --mode="development"`);
 
   // Create a .gitignore file
   fs.writeFileSync('.gitignore', 'node_modules\n');
 
-  runCommand('git init');
-  runCommand('git add .');
-  runCommand('git commit -m "Initial commit from create-my-app"');
+  announceCommand('git init');
+  announceCommand('git add .');
+  announceCommand('git commit -m "Initial commit from create-my-app"');
 
   function printEndingMessage() {
     console.log('\n\n');
