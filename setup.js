@@ -4,6 +4,7 @@ import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import chalk from 'chalk';
+import inquirer from 'inquirer';
 import { Command } from 'commander';
 
 const program = new Command();
@@ -39,52 +40,63 @@ const runCommand = command => {
   execSync(command, { stdio: 'inherit' });
 };
 
-try {
-  execSync('pnpm --version', { stdio: 'ignore' });
-} catch (e) {
-  console.log('pnpm not found. Installing pnpm...');
-  runCommand('npm install -g pnpm@9.12.3');
-}
+(async () => {
+  const { packageManager } = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'packageManager',
+      message: 'Which package manager do you want to use?',
+      choices: ['pnpm', 'npm'],
+    },
+  ]);
 
-fs.mkdirSync(appName);
-
-const copyRecursiveSync = (src, dest) => {
-  const entries = fs.readdirSync(src, { withFileTypes: true });
-  if (!fs.existsSync(dest)) {
-    fs.mkdirSync(dest);
+  try {
+    execSync(`${packageManager} --version`, { stdio: 'ignore' });
+  } catch (e) {
+    console.log(`${packageManager} not found. Installing ${packageManager}...`);
+    runCommand(`npm install -g ${packageManager}`);
   }
-  for (let entry of entries) {
-    const srcPath = path.join(src, entry.name);
-    const destPath = path.join(dest, entry.name);
-    if (entry.name !== scriptName && entry.name !== '.git') {
-      if (!fs.existsSync(srcPath)) {
-        console.log(`File not found: ${srcPath}`);
-        continue;
-      }
-      entry.isDirectory() ? copyRecursiveSync(srcPath, destPath) : fs.copyFileSync(srcPath, destPath);
-      console.log(`Copied: ${entry.name}`);
+
+  fs.mkdirSync(appName);
+
+  const copyRecursiveSync = (src, dest) => {
+    const entries = fs.readdirSync(src, { withFileTypes: true });
+    if (!fs.existsSync(dest)) {
+      fs.mkdirSync(dest);
     }
+    for (let entry of entries) {
+      const srcPath = path.join(src, entry.name);
+      const destPath = path.join(dest, entry.name);
+      if (entry.name !== scriptName && entry.name !== '.git') {
+        if (!fs.existsSync(srcPath)) {
+          console.log(`File not found: ${srcPath}`);
+          continue;
+        }
+        entry.isDirectory() ? copyRecursiveSync(srcPath, destPath) : fs.copyFileSync(srcPath, destPath);
+        console.log(`Copied: ${entry.name}`);
+      }
+    }
+  };
+
+  copyRecursiveSync(baseAppDir, appName);
+
+  process.chdir(appName);
+  runCommand(`${packageManager} install`);
+  runCommand(`${packageManager} exec webpack --mode="development"`);
+
+  // Create a .gitignore file
+  fs.writeFileSync('.gitignore', 'node_modules\n');
+
+  runCommand('git init');
+  runCommand('git add .');
+  runCommand('git commit -m "Initial commit from create-my-app"');
+
+  function printEndingMessage() {
+    console.log('\n\n');
+    console.log(chalk.green('Express app setup complete with custom configurations!'));
+    console.log(chalk.yellow('Run the following command to start the server:\n'));
+    console.log(chalk.blue(`cd ${appName} && ${packageManager} start\n`));
   }
-};
 
-copyRecursiveSync(baseAppDir, appName);
-
-process.chdir(appName);
-runCommand('pnpm install');
-runCommand('pnpm exec webpack --mode="development"');
-
-// Create a .gitignore file
-fs.writeFileSync('.gitignore', 'node_modules\n');
-
-runCommand('git init');
-runCommand('git add .');
-runCommand('git commit -m "Initial commit from create-my-app"');
-
-function printEndingMessage() {
-  console.log('\n\n');
-  console.log(chalk.green('Express app setup complete with custom configurations!'));
-  console.log(chalk.yellow('Run the following command to start the server:\n'));
-  console.log(chalk.blue(`cd ${appName} && pnpm start\n`));
-}
-
-printEndingMessage();
+  printEndingMessage();
+})();
