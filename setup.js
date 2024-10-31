@@ -113,7 +113,7 @@ const shouldIgnore = (name) => {
     console.log('\n\n');
     console.log(chalk.green('Express app setup complete with custom configurations!'));
     console.log(chalk.yellow('Run the following command to start the server:\n'));
-    console.log(chalk.blue(`cd ${appName} && ${packageManager} start\n`));
+    console.log(chalk.blue(`cd ${appName} && ${packageManager} run start:dev\n`));
   }
 
   printEndingMessage();
