@@ -4,3 +4,8 @@
 # Include the base-app directory
 !base-app/
 !base-app/**
+
+# Include these specific files
+!.gitignore
+!.npmignore
+!pnpm-lock.yaml
