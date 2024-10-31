@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-const { execSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
-const chalk = require('chalk');
+import { execSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import chalk from 'chalk';
 
 // Read package.json to get the version
-const packageJson = require('./package.json');
+import packageJson from './package.json' assert { type: 'json' };
 const version = packageJson.version;
 
 // Check for --version flag
@@ -62,7 +62,9 @@ process.chdir(appName);
 runCommand('pnpm install');
 runCommand('pnpm exec webpack --mode="development"');
 
-// Initialize a fresh Git repository
+// Create a .gitignore file
+fs.writeFileSync('.gitignore', 'node_modules\n');
+
 runCommand('git init');
 runCommand('git add .');
 runCommand('git commit -m "Initial commit from create-my-app"');
