@@ -28,7 +28,7 @@ program.parse(process.argv);
 const options = program.opts();
 
 if (options.ver) {
-  console.log(`create-my-app version: ${version}`);
+  console.log(`create-my-app version: ${version}\n`);
   process.exit(0);
 }
 
@@ -69,6 +69,8 @@ const shouldIgnore = (name) => {
   }
 
   fs.mkdirSync(appName);
+
+  console.log(chalk.cyan('Setting up files for the application...'));
 
   const copyRecursiveSync = (src, dest) => {
     const entries = fs.readdirSync(src, { withFileTypes: true });
