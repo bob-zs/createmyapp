@@ -45,6 +45,13 @@ const runCommand = command => {
   execSync(command, { stdio: 'inherit' });
 };
 
+// Default ignores inspired by .gitignore and .npmignore
+const defaultIgnores = ['.git', 'node_modules', 'dist', '*.log', 'coverage', 'temp'];
+
+const shouldIgnore = (name) => {
+  return defaultIgnores.some(ignore => name === ignore || name.startsWith(ignore.replace('*', '')));
+};
+
 (async () => {
   const { packageManager } = await enquirer.prompt({
     type: 'select',
@@ -70,7 +77,7 @@ const runCommand = command => {
     for (let entry of entries) {
       const srcPath = path.join(src, entry.name);
       const destPath = path.join(dest, entry.name);
-      if (entry.name !== scriptName && entry.name !== '.git') {
+      if (entry.name !== scriptName && !shouldIgnore(entry.name)) {
         if (!fs.existsSync(srcPath)) {
           console.log(`File not found: ${srcPath}`);
           continue;

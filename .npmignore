@@ -1,11 +1,18 @@
-# Ignore everything
+# Ignore everything by default
 *
 
 # Include the base-app directory
 !base-app/
 !base-app/**
 
-# Include these specific files
+# Include specific necessary files
 !.gitignore
 !.npmignore
 !pnpm-lock.yaml
+
+# Exclude unnecessary files
+base-app/node_modules
+base-app/dist
+base-app/*.log
+base-app/coverage
+base-app/temp
