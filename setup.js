@@ -107,6 +107,7 @@ const shouldIgnore = (name) => {
   runCommand(`${packageManager} install`);
   runCommand(`${packageManager} exec webpack --mode="development"`);
 
+  console.log('\n');
   // Create a .gitignore file
   fs.writeFileSync('.gitignore', 'node_modules\n');
 
