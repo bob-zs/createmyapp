@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -9,12 +8,9 @@ import enquirer from 'enquirer';
 import { fileURLToPath } from 'url';
 
 const program = new Command();
-
-// Define __filename and __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Read package.json to get the version
 const packageJsonPath = path.join(__dirname, 'package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 const version = packageJson.version;
@@ -24,9 +20,7 @@ program
   .option('-v, --ver', 'output the version number');
 
 program.parse(process.argv);
-
 const options = program.opts();
-
 if (options.ver) {
   console.log(`create-my-app version: ${version}\n`);
   process.exit(0);
@@ -47,12 +41,13 @@ const runCommand = command => {
   console.log('\n');
 };
 
-// Default ignores inspired by .gitignore and .npmignore
 const defaultIgnores = ['.git', 'node_modules', 'dist', '*.log', 'coverage', 'temp', '.npmignore'];
 
 const shouldIgnore = (name) => {
-  return defaultIgnores.some(ignore => name === ignore || name.startsWith(ignore.replace('*', '')));
+  if (name === '.git') return true;
+  return defaultIgnores.some(ignore => name.startsWith(ignore.replace('*', '')));
 };
+
 
 (async () => {
   const { packageManager } = await enquirer.prompt({
@@ -70,7 +65,6 @@ const shouldIgnore = (name) => {
   }
 
   fs.mkdirSync(appName);
-
   console.log(chalk.cyan('Setting up files for the application...'));
 
   const copyRecursiveSync = (src, dest) => {
@@ -97,7 +91,6 @@ const shouldIgnore = (name) => {
 
   process.chdir(appName);
 
-  // Ensure only the relevant lock file is retained based on the package manager
   if (packageManager === 'npm') {
     if (fs.existsSync('pnpm-lock.yaml')) fs.unlinkSync('pnpm-lock.yaml');
   } else if (packageManager === 'pnpm') {
@@ -106,10 +99,8 @@ const shouldIgnore = (name) => {
 
   runCommand(`${packageManager} install`);
   runCommand(`${packageManager} exec webpack --mode="development"`);
-  console.log('\n');
 
-  // Copy .gitignore from base app
-  fs.copyFileSync(path.join(baseAppDir, '.gitignore'), path.join(appName, '.gitignore'));
+  console.log('\n');
 
   runCommand('git init');
   runCommand('git add .');
