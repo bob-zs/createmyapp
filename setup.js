@@ -44,6 +44,7 @@ if (fs.existsSync(appName)) {
 const runCommand = command => {
   console.log(chalk.cyan(`Running: ${command}`));
   execSync(command, { stdio: 'inherit' });
+  console.log('\n');
 };
 
 // Default ignores inspired by .gitignore and .npmignore
@@ -70,7 +71,7 @@ const shouldIgnore = (name) => {
 
   fs.mkdirSync(appName);
 
-  console.log(chalk.cyan('Setting up files for the application...\n'));
+  console.log(chalk.cyan('Setting up files for the application...'));
 
   const copyRecursiveSync = (src, dest) => {
     const entries = fs.readdirSync(src, { withFileTypes: true });
@@ -92,6 +93,7 @@ const shouldIgnore = (name) => {
   };
 
   copyRecursiveSync(baseAppDir, appName);
+  console.log('\n');
 
   process.chdir(appName);
 
