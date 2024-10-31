@@ -44,7 +44,6 @@ if (fs.existsSync(appName)) {
 const runCommand = command => {
   console.log(chalk.cyan(`Running: ${command}`));
   execSync(command, { stdio: 'inherit' });
-  console.log('\n');
 };
 
 // Default ignores inspired by .gitignore and .npmignore
@@ -71,7 +70,7 @@ const shouldIgnore = (name) => {
 
   fs.mkdirSync(appName);
 
-  console.log(chalk.cyan('Setting up files for the application...'));
+  console.log(chalk.cyan('Setting up files for the application...\n'));
 
   const copyRecursiveSync = (src, dest) => {
     const entries = fs.readdirSync(src, { withFileTypes: true });
@@ -114,8 +113,7 @@ const shouldIgnore = (name) => {
   runCommand(`git commit -m "Initial commit from create-my-app for ${appName}"`);
 
   function printEndingMessage() {
-    console.log('\n\n');
-    console.log(chalk.green('Express app setup complete with custom configurations!'));
+    console.log(chalk.green('\nExpress app setup complete with custom configurations!'));
     console.log(chalk.yellow('Run the following command to start the server:\n'));
     console.log(chalk.blue(`cd ${appName} && ${packageManager} run start:dev\n`));
   }
