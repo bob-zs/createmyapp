@@ -5,11 +5,6 @@ const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk');
 
-// ANSI escape codes for coloring text
-const green = text => `\x1b[32m${text}\x1b[0m`;
-const yellow = text => `\x1b[33m${text}\x1b[0m`;
-const blue = text => `\x1b[34m${text}\x1b[0m`;
-
 // Read package.json to get the version
 const packageJson = require('./package.json');
 const version = packageJson.version;
