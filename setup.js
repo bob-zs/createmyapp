@@ -83,7 +83,7 @@ const shouldIgnore = (name) => {
           continue;
         }
         entry.isDirectory() ? copyRecursiveSync(srcPath, destPath) : fs.copyFileSync(srcPath, destPath);
-        console.log(`Copied: ${entry.name}`);
+        console.log(`Copied: ${path.relative(baseAppDir, srcPath)}`);
       }
     }
   };
@@ -91,6 +91,14 @@ const shouldIgnore = (name) => {
   copyRecursiveSync(baseAppDir, appName);
 
   process.chdir(appName);
+
+  // Copy relevant lock file based on package manager
+  if (packageManager === 'npm') {
+    if (fs.existsSync(path.join(baseAppDir, 'pnpm-lock.yaml'))) fs.unlinkSync(path.join(baseAppDir, 'pnpm-lock.yaml'));
+  } else if (packageManager === 'pnpm') {
+    if (fs.existsSync(path.join(baseAppDir, 'package-lock.json'))) fs.unlinkSync(path.join(baseAppDir, 'package-lock.json'));
+  }
+
   runCommand(`${packageManager} install`);
   runCommand(`${packageManager} exec webpack --mode="development"`);
 
