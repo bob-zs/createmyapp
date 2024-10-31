@@ -4,13 +4,18 @@ import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import chalk from 'chalk';
-import inquirer from 'inquirer';
 import { Command } from 'commander';
+import enquirer from 'enquirer';
+import { fileURLToPath } from 'url';
 
 const program = new Command();
 
+// Define __dirname for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // Read package.json to get the version
-const packageJsonPath = path.join(process.cwd(), 'package.json');
+const packageJsonPath = path.join(__dirname, 'package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 const version = packageJson.version;
 
@@ -41,14 +46,12 @@ const runCommand = command => {
 };
 
 (async () => {
-  const { packageManager } = await inquirer.prompt([
-    {
-      type: 'list',
-      name: 'packageManager',
-      message: 'Which package manager do you want to use?',
-      choices: ['pnpm', 'npm'],
-    },
-  ]);
+  const { packageManager } = await enquirer.prompt({
+    type: 'select',
+    name: 'packageManager',
+    message: 'Which package manager do you want to use?',
+    choices: ['pnpm', 'npm'],
+  });
 
   try {
     execSync(`${packageManager} --version`, { stdio: 'ignore' });
