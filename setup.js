@@ -3,6 +3,7 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const chalk = require('chalk');
 
 // ANSI escape codes for coloring text
 const green = text => `\x1b[32m${text}\x1b[0m`;
@@ -73,9 +74,9 @@ runCommand('git commit -m "Initial commit from create-my-app"');
 
 function printEndingMessage() {
   console.log('\n\n');
-  console.log(green('Express app setup complete with custom configurations!'));
-  console.log(yellow('Run the following command to start the server:\n'));
-  console.log(blue(`cd ${appName} && pnpm start\n`));
+  console.log(chalk.green('Express app setup complete with custom configurations!'));
+  console.log(chalk.yellow('Run the following command to start the server:\n'));
+  console.log(chalk.blue(`cd ${appName} && pnpm start\n`));
 }
 
 printEndingMessage();
