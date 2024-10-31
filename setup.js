@@ -44,6 +44,7 @@ if (fs.existsSync(appName)) {
 const runCommand = command => {
   console.log(chalk.cyan(`Running: ${command}`));
   execSync(command, { stdio: 'inherit' });
+  console.log('\n');
 };
 
 // Default ignores inspired by .gitignore and .npmignore
@@ -110,7 +111,7 @@ const shouldIgnore = (name) => {
 
   runCommand('git init');
   runCommand('git add .');
-  runCommand('git commit -m "Initial commit from create-my-app"');
+  runCommand(`git commit -m "Initial commit from create-my-app for ${appName}"`);
 
   function printEndingMessage() {
     console.log('\n\n');
