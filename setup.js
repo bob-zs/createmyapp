@@ -41,9 +41,16 @@ if (fs.existsSync(appName)) {
   process.exit(1);
 }
 
-const announceCommand = (command) => {
+const runCommand = command => {
   console.log(chalk.cyan(`Running: ${command}`));
   execSync(command, { stdio: 'inherit' });
+};
+
+// Default ignores inspired by .gitignore and .npmignore
+const defaultIgnores = ['.git', 'node_modules', 'dist', '*.log', 'coverage', 'temp'];
+
+const shouldIgnore = (name) => {
+  return defaultIgnores.some(ignore => name === ignore || name.startsWith(ignore.replace('*', '')));
 };
 
 (async () => {
@@ -55,10 +62,10 @@ const announceCommand = (command) => {
   });
 
   try {
-    announceCommand(`${packageManager} --version`);
+    runCommand(`${packageManager} --version`);
   } catch (e) {
     console.log(`${packageManager} not found. Installing ${packageManager}...`);
-    announceCommand(`npm install -g ${packageManager}`);
+    runCommand(`npm install -g ${packageManager}`);
   }
 
   fs.mkdirSync(appName);
@@ -93,15 +100,15 @@ const announceCommand = (command) => {
     if (fs.existsSync(path.join(baseAppDir, 'package-lock.json'))) fs.unlinkSync(path.join(baseAppDir, 'package-lock.json'));
   }
 
-  announceCommand(`${packageManager} install`);
-  announceCommand(`${packageManager} exec webpack --mode="development"`);
+  runCommand(`${packageManager} install`);
+  runCommand(`${packageManager} exec webpack --mode="development"`);
 
   // Create a .gitignore file
   fs.writeFileSync('.gitignore', 'node_modules\n');
 
-  announceCommand('git init');
-  announceCommand('git add .');
-  announceCommand('git commit -m "Initial commit from create-my-app"');
+  runCommand('git init');
+  runCommand('git add .');
+  runCommand('git commit -m "Initial commit from create-my-app"');
 
   function printEndingMessage() {
     console.log('\n\n');
