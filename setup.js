@@ -48,7 +48,7 @@ const runCommand = command => {
 };
 
 // Default ignores inspired by .gitignore and .npmignore
-const defaultIgnores = ['.git', 'node_modules', 'dist', '*.log', 'coverage', 'temp'];
+const defaultIgnores = ['.git', 'node_modules', 'dist', '*.log', 'coverage', 'temp', '.npmignore'];
 
 const shouldIgnore = (name) => {
   return defaultIgnores.some(ignore => name === ignore || name.startsWith(ignore.replace('*', '')));
@@ -97,17 +97,17 @@ const shouldIgnore = (name) => {
 
   process.chdir(appName);
 
-  // Copy relevant lock file based on package manager
+  // Ensure only the relevant lock file is retained based on the package manager
   if (packageManager === 'npm') {
-    if (fs.existsSync(path.join(baseAppDir, 'pnpm-lock.yaml'))) fs.unlinkSync(path.join(baseAppDir, 'pnpm-lock.yaml'));
+    if (fs.existsSync('pnpm-lock.yaml')) fs.unlinkSync('pnpm-lock.yaml');
   } else if (packageManager === 'pnpm') {
-    if (fs.existsSync(path.join(baseAppDir, 'package-lock.json'))) fs.unlinkSync(path.join(baseAppDir, 'package-lock.json'));
+    if (fs.existsSync('package-lock.json')) fs.unlinkSync('package-lock.json');
   }
 
   runCommand(`${packageManager} install`);
   runCommand(`${packageManager} exec webpack --mode="development"`);
-
   console.log('\n');
+
   // Create a .gitignore file
   fs.writeFileSync('.gitignore', 'node_modules\n');
 
