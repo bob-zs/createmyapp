@@ -108,8 +108,8 @@ const shouldIgnore = (name) => {
   runCommand(`${packageManager} exec webpack --mode="development"`);
   console.log('\n');
 
-  // Create a .gitignore file
-  fs.writeFileSync('.gitignore', 'node_modules\n');
+  // Copy .gitignore from base app
+  fs.copyFileSync(path.join(baseAppDir, '.gitignore'), path.join(appName, '.gitignore'));
 
   runCommand('git init');
   runCommand('git add .');
