@@ -4,13 +4,24 @@ import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import chalk from 'chalk';
+import { Command } from 'commander';
+
+const program = new Command();
 
 // Read package.json to get the version
-import packageJson from './package.json' assert { type: 'json' };
+const packageJsonPath = path.join(process.cwd(), 'package.json');
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 const version = packageJson.version;
 
-// Check for --version flag
-if (process.argv.includes('--version')) {
+program
+  .version(version)
+  .option('-v, --ver', 'output the version number');
+
+program.parse(process.argv);
+
+const options = program.opts();
+
+if (options.ver) {
   console.log(`create-my-app version: ${version}`);
   process.exit(0);
 }
