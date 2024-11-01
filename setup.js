@@ -44,10 +44,35 @@ const runCommand = command => {
 const defaultIgnores = ['.git', 'node_modules', 'dist', '*.log', 'coverage', 'temp', '.npmignore'];
 
 const shouldIgnore = (name) => {
-  if (name === '.git') return true;
   return defaultIgnores.some(ignore => name.startsWith(ignore.replace('*', '')));
 };
 
+const copyRecursiveSync = (src, dest) => {
+  const entries = fs.readdirSync(src, { withFileTypes: true });
+  if (!fs.existsSync(dest)) {
+    fs.mkdirSync(dest);
+  }
+  for (let entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+    if (entry.name !== scriptName && !shouldIgnore(entry.name)) {
+      if (!fs.existsSync(srcPath)) {
+        console.log(`File not found: ${srcPath}`);
+        continue;
+      }
+      entry.isDirectory() ? copyRecursiveSync(srcPath, destPath) : fs.copyFileSync(srcPath, destPath);
+      console.log(`Copied: ${path.relative(baseAppDir, srcPath)}`);
+    }
+  }
+
+  // Explicitly copy and rename gitignore to .gitignore if it exists
+  const gitignoreSrcPath = path.join(src, 'gitignore');
+  if (fs.existsSync(gitignoreSrcPath)) {
+    const gitignoreDestPath = path.join(dest, '.gitignore');
+    fs.copyFileSync(gitignoreSrcPath, gitignoreDestPath);
+    console.log(`Copied: .gitignore`);
+  }
+};
 
 (async () => {
   const { packageManager } = await enquirer.prompt({
@@ -66,36 +91,6 @@ const shouldIgnore = (name) => {
 
   fs.mkdirSync(appName);
   console.log(kleur.cyan('Setting up files for the application...'));
-
-  const copyRecursiveSync = (src, dest) => {
-    const entries = fs.readdirSync(src, { withFileTypes: true });
-    if (!fs.existsSync(dest)) {
-      fs.mkdirSync(dest);
-    }
-    for (let entry of entries) {
-      const srcPath = path.join(src, entry.name);
-      const destPath = path.join(dest, entry.name);
-      if (entry.name !== scriptName && !shouldIgnore(entry.name)) {
-        if (!fs.existsSync(srcPath)) {
-          console.log(`File not found: ${srcPath}`);
-          continue;
-        }
-        entry.isDirectory() ? copyRecursiveSync(srcPath, destPath) : fs.copyFileSync(srcPath, destPath);
-        console.log(`Copied: ${path.relative(baseAppDir, srcPath)}`);
-      }
-    }
-
-    // Check for .gitignore explicitly
-    const gitignoreSrcPath = path.join(src, '.gitignore');
-    console.log(`Looking for .gitignore at: ${gitignoreSrcPath}`);
-    if (fs.existsSync(gitignoreSrcPath)) {
-      const gitignoreDestPath = path.join(dest, '.gitignore');
-      fs.copyFileSync(gitignoreSrcPath, gitignoreDestPath);
-      console.log(`Copied: .gitignore`);
-    } else {
-      console.log(`.gitignore not found at: ${gitignoreSrcPath}`);
-    }
-  };
 
   copyRecursiveSync(baseAppDir, appName);
   console.log('\n');
