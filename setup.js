@@ -84,6 +84,14 @@ const shouldIgnore = (name) => {
         console.log(`Copied: ${path.relative(baseAppDir, srcPath)}`);
       }
     }
+
+    // Explicitly copy .gitignore if it exists
+    const gitignoreSrcPath = path.join(src, '.gitignore');
+    if (fs.existsSync(gitignoreSrcPath)) {
+      const gitignoreDestPath = path.join(dest, '.gitignore');
+      fs.copyFileSync(gitignoreSrcPath, gitignoreDestPath);
+      console.log(`Copied: .gitignore`);
+    }
   };
 
   copyRecursiveSync(baseAppDir, appName);
