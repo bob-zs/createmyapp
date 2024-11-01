@@ -85,12 +85,15 @@ const shouldIgnore = (name) => {
       }
     }
 
-    // Explicitly copy .gitignore if it exists
+    // Check for .gitignore explicitly
     const gitignoreSrcPath = path.join(src, '.gitignore');
+    console.log(`Looking for .gitignore at: ${gitignoreSrcPath}`);
     if (fs.existsSync(gitignoreSrcPath)) {
       const gitignoreDestPath = path.join(dest, '.gitignore');
       fs.copyFileSync(gitignoreSrcPath, gitignoreDestPath);
       console.log(`Copied: .gitignore`);
+    } else {
+      console.log(`.gitignore not found at: ${gitignoreSrcPath}`);
     }
   };
 
