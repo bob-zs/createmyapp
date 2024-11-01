@@ -2,7 +2,7 @@
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import chalk from 'chalk';
+import kleur from 'kleur';
 import { Command } from 'commander';
 import enquirer from 'enquirer';
 import { fileURLToPath } from 'url';
@@ -36,7 +36,7 @@ if (fs.existsSync(appName)) {
 }
 
 const runCommand = command => {
-  console.log(chalk.cyan(`Running: ${command}`));
+  console.log(kleur.cyan(`Running: ${command}`));
   execSync(command, { stdio: 'inherit' });
   console.log('\n');
 };
@@ -65,7 +65,7 @@ const shouldIgnore = (name) => {
   }
 
   fs.mkdirSync(appName);
-  console.log(chalk.cyan('Setting up files for the application...'));
+  console.log(kleur.cyan('Setting up files for the application...'));
 
   const copyRecursiveSync = (src, dest) => {
     const entries = fs.readdirSync(src, { withFileTypes: true });
@@ -107,9 +107,9 @@ const shouldIgnore = (name) => {
   runCommand(`git commit -m "Initial commit from create-my-app for ${appName}"`);
 
   function printEndingMessage() {
-    console.log(chalk.green('\nExpress app setup complete with custom configurations!'));
-    console.log(chalk.yellow('Run the following command to start the server:\n'));
-    console.log(chalk.blue(`cd ${appName} && ${packageManager} run start:dev\n`));
+    console.log(kleur.green('\nExpress app setup complete with custom configurations!'));
+    console.log(kleur.yellow('Run the following command to start the server:\n'));
+    console.log(kleur.blue(`cd ${appName} && ${packageManager} run start:dev\n`));
   }
 
   printEndingMessage();
