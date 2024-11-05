@@ -1,4 +1,4 @@
 export default {
-  testMatch: ["**/tests/**/*.test.mjs"],
-  testPathIgnorePatterns: ["/node_modules/", "/base-app/"],
+  testMatch: ["**/tests/**/*.test.js"],
+  testPathIgnorePatterns: ["/node_modules/", "/base-app/"]
 };
