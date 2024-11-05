@@ -2,21 +2,26 @@
   "name": "@bob-zs/createmyapp",
   "version": "0.1.0",
   "main": "setup.js",
+  "type": "module",
   "bin": {
     "create-my-app": "setup.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
-  "type": "module",
   "packageManager": "pnpm@9.12.3+sha512.cce0f9de9c5a7c95bef944169cc5dfe8741abfb145078c0d508b868056848a87c81e626246cb60967cbd7fd29a6c062ef73ff840d96b3c86c40ac92cf4a813ee",
   "dependencies": {
     "commander": "^12.1.0",
     "enquirer": "^2.4.1",
     "kleur": "^4.1.5"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.26.0",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0"
   }
 }
