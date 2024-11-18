@@ -1,39 +1,16 @@
-#!/usr/bin/env node
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import kleur from 'kleur';
-import { Command } from 'commander';
 import enquirer from 'enquirer';
 import { fileURLToPath } from 'url';
 
-const program = new Command();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const packageJsonPath = path.join(__dirname, 'package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 const version = packageJson.version;
-
-program
-  .version(version)
-  .option('-v, --ver', 'output the version number');
-
-program.parse(process.argv);
-const options = program.opts();
-if (options.ver) {
-  console.log(`create-my-app version: ${version}\n`);
-  process.exit(0);
-}
-
-const baseAppDir = path.join(__dirname, 'base-app');
-const scriptName = path.basename(process.argv[1]);
-const appName = process.argv[2] || 'my-app';
-
-if (fs.existsSync(appName)) {
-  console.error(`Error: Directory "${appName}" already exists. Please choose a different name.`);
-  process.exit(1);
-}
 
 const runCommand = command => {
   console.log(kleur.cyan(`Running: ${command}`));
@@ -65,7 +42,6 @@ const copyRecursiveSync = (src, dest) => {
     }
   }
 
-  // Explicitly copy and rename gitignore to .gitignore if it exists
   const gitignoreSrcPath = path.join(src, 'gitignore');
   if (fs.existsSync(gitignoreSrcPath)) {
     const gitignoreDestPath = path.join(dest, '.gitignore');
@@ -74,14 +50,7 @@ const copyRecursiveSync = (src, dest) => {
   }
 };
 
-(async () => {
-  const { packageManager } = await enquirer.prompt({
-    type: 'select',
-    name: 'packageManager',
-    message: 'Which package manager do you want to use?',
-    choices: ['pnpm', 'npm'],
-  });
-
+export const setupApp = async (appName, packageManager) => {
   try {
     runCommand(`${packageManager} --version`);
   } catch (e) {
@@ -112,11 +81,7 @@ const copyRecursiveSync = (src, dest) => {
   runCommand('git add .');
   runCommand(`git commit -m "Initial commit from create-my-app for ${appName}"`);
 
-  function printEndingMessage() {
-    console.log(kleur.green('\nExpress app setup complete with custom configurations!'));
-    console.log(kleur.yellow('Run the following command to start the server:\n'));
-    console.log(kleur.blue(`cd ${appName} && ${packageManager} run start:dev\n`));
-  }
-
-  printEndingMessage();
-})();
+  console.log(kleur.green('\nExpress app setup complete with custom configurations!'));
+  console.log(kleur.yellow('Run the following command to start the server:\n'));
+  console.log(kleur.blue(`cd ${appName} && ${packageManager} run start:dev\n`));
+};
