@@ -1,0 +1,35 @@
+{
+  "name": "jpfp",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:dev": "webpack --watch --mode='development'",
+    "server:dev": "nodemon server --watch server",
+    "start:dev": "pnpm run build:dev & pnpm run server:dev",
+    "prepublishOnly": "npm test",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.1",
+    "module-alias": "^2.2.3",
+    "pg": "^8.13.0",
+    "sequelize": "^6.37.4"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^9.0.3",
+    "@types/module-alias": "^2.0.4",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.7",
+    "webpack": "^5.95.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "_moduleAliases": {
+    "@db": "lib/db",
+    "@utils": "lib/utils"
+  },
+  "packageManager": "pnpm@9.12.3+sha512.cce0f9de9c5a7c95bef944169cc5dfe8741abfb145078c0d508b868056848a87c81e626246cb60967cbd7fd29a6c062ef73ff840d96b3c86c40ac92cf4a813ee"
+}
