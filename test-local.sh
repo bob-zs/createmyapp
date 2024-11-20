@@ -95,9 +95,9 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Run the package command
+# Run the package command and check if files were created
 echo "Running package command..."
-pnpx create-my-app
+pnpx create-my-app && ls -l
 if [ $? -ne 0 ]; then
     echo "Running package command failed."
     cd ..
