@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@bob-zs/createmyapp':
+        specifier: ^0.1.0
+        version: 0.1.0(@types/node@22.9.1)
       commander:
         specifier: ^12.1.0
         version: 12.1.0
@@ -20,6 +23,9 @@ importers:
       kleur:
         specifier: ^4.1.5
         version: 4.1.5
+      your-package-name:
+        specifier: ^0.0.0
+        version: 0.0.0
 
 packages:
 
@@ -187,6 +193,10 @@ packages:
 
   '@bcoe/v8-coverage@0.2.3':
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
+
+  '@bob-zs/createmyapp@0.1.0':
+    resolution: {integrity: sha512-elTtL70zGruhXA+RnoQ3cZFPBO4tEOXxxScVZWCyDLzGwMMOda9a70wjA5XspYiJwj6v7Pzaolo1ypFmZdqEYg==}
+    hasBin: true
 
   '@istanbuljs/load-nyc-config@1.1.0':
     resolution: {integrity: sha512-VjeHSlIzpv/NyD3N0YuHfXOPDIixcA1q2ZV98wsMqcYlPmv2n3Yb2lYP9XMElnaFVXg5A7YLTeLu6V84uQDjmQ==}
@@ -1119,6 +1129,9 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
+  your-package-name@0.0.0:
+    resolution: {integrity: sha512-rSZcXpHm/885/C4tREMNhfdX8BiQuPM8zt/jvxL/qUJsweVrUlyluT5cQv+R4tQNoz5npIQ4gc/bww+7vLy6WA==}
+
 snapshots:
 
   '@ampproject/remapping@2.3.0':
@@ -1312,6 +1325,20 @@ snapshots:
       '@babel/helper-validator-identifier': 7.25.9
 
   '@bcoe/v8-coverage@0.2.3': {}
+
+  '@bob-zs/createmyapp@0.1.0(@types/node@22.9.1)':
+    dependencies:
+      commander: 12.1.0
+      enquirer: 2.4.1
+      jest: 29.7.0(@types/node@22.9.1)
+      kleur: 4.1.5
+      your-package-name: 0.0.0
+    transitivePeerDependencies:
+      - '@types/node'
+      - babel-plugin-macros
+      - node-notifier
+      - supports-color
+      - ts-node
 
   '@istanbuljs/load-nyc-config@1.1.0':
     dependencies:
@@ -2480,3 +2507,5 @@ snapshots:
       yargs-parser: 21.1.1
 
   yocto-queue@0.1.0: {}
+
+  your-package-name@0.0.0: {}

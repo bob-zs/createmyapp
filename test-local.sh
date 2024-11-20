@@ -8,10 +8,11 @@ VERDACCIO_IMAGE="verdaccio/verdaccio"
 VERDACCIO_CONTAINER_NAME="verdaccio"
 VERDACCIO_PORT="4873"
 REGISTRY_URL="http://localhost:${VERDACCIO_PORT}"
-PACKAGE_NAME="your-package-name"
+PACKAGE_NAME="@bob-zs/createmyapp"
 USERNAME="test"
 PASSWORD="test_password"
 EMAIL="test@domain.com"
+TMP_DIR=$(mktemp -d)
 
 # Check if Docker is installed
 if ! command -v docker &> /dev/null
@@ -48,9 +49,9 @@ if ! curl -s ${REGISTRY_URL} > /dev/null; then
     exit 1
 fi
 
-# Authenticate with Verdaccio
+# Authenticate with Verdaccio using npm-cli-login
 echo "Authenticating with Verdaccio..."
-echo -e "${USERNAME}\n${PASSWORD}\n${EMAIL}\n" | pnpm adduser --registry ${REGISTRY_URL} --always-auth
+npx npm-cli-login -u ${USERNAME} -p ${PASSWORD} -e ${EMAIL} -r ${REGISTRY_URL}
 if [ $? -ne 0 ]; then
     echo "Authentication with Verdaccio failed."
     docker stop ${VERDACCIO_CONTAINER_NAME}
@@ -68,9 +69,19 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Verify package is published
+echo "Checking package information..."
+pnpm info ${PACKAGE_NAME} --registry ${REGISTRY_URL}
+if [ $? -ne 0 ]; then
+    echo "Package information could not be retrieved. Exiting."
+    docker stop ${VERDACCIO_CONTAINER_NAME}
+    docker rm ${VERDACCIO_CONTAINER_NAME}
+    exit 1
+fi
+
 # Create a test directory and switch to it
-mkdir test-install
-cd test-install
+mkdir ${TMP_DIR}/test-install
+cd ${TMP_DIR}/test-install
 
 # Install the package
 echo "Installing package..."
@@ -78,7 +89,7 @@ pnpm add ${PACKAGE_NAME} --registry ${REGISTRY_URL}
 if [ $? -ne 0 ]; then
     echo "Installing package failed."
     cd ..
-    rm -rf test-install
+    rm -rf ${TMP_DIR}
     docker stop ${VERDACCIO_CONTAINER_NAME}
     docker rm ${VERDACCIO_CONTAINER_NAME}
     exit 1
@@ -86,11 +97,11 @@ fi
 
 # Run the package command
 echo "Running package command..."
-pnpx ${PACKAGE_NAME}
+pnpx create-my-app
 if [ $? -ne 0 ]; then
     echo "Running package command failed."
     cd ..
-    rm -rf test-install
+    rm -rf ${TMP_DIR}
     docker stop ${VERDACCIO_CONTAINER_NAME}
     docker rm ${VERDACCIO_CONTAINER_NAME}
     exit 1
@@ -98,7 +109,7 @@ fi
 
 # Clean up
 cd ..
-rm -rf test-install
+rm -rf ${TMP_DIR}
 
 # Stop and remove the Verdaccio container
 echo "Stopping and removing Verdaccio container..."
