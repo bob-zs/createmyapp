@@ -9,6 +9,9 @@ VERDACCIO_CONTAINER_NAME="verdaccio"
 VERDACCIO_PORT="4873"
 REGISTRY_URL="http://localhost:${VERDACCIO_PORT}"
 PACKAGE_NAME="your-package-name"
+USERNAME="test"
+PASSWORD="test_password"
+EMAIL="test@domain.com"
 
 # Check if Docker is installed
 if ! command -v docker &> /dev/null
@@ -47,7 +50,7 @@ fi
 
 # Authenticate with Verdaccio
 echo "Authenticating with Verdaccio..."
-echo -e "test\ntest_password\ntest@domain.com\n" | pnpm adduser --registry ${REGISTRY_URL} --always-auth
+echo -e "${USERNAME}\n${PASSWORD}\n${EMAIL}\n" | pnpm adduser --registry ${REGISTRY_URL} --always-auth
 if [ $? -ne 0 ]; then
     echo "Authentication with Verdaccio failed."
     docker stop ${VERDACCIO_CONTAINER_NAME}
