@@ -83,21 +83,9 @@ fi
 mkdir ${TMP_DIR}/test-install
 cd ${TMP_DIR}/test-install
 
-# Install the package
-echo "Installing package..."
-pnpm add ${PACKAGE_NAME} --registry ${REGISTRY_URL}
-if [ $? -ne 0 ]; then
-    echo "Installing package failed."
-    cd ..
-    rm -rf ${TMP_DIR}
-    docker stop ${VERDACCIO_CONTAINER_NAME}
-    docker rm ${VERDACCIO_CONTAINER_NAME}
-    exit 1
-fi
-
-# Run the package command and check if files were created
+# Run the package command directly
 echo "Running package command..."
-pnpx create-my-app && ls -l
+pnpx -p ${PACKAGE_NAME} create-my-app my-app && ls -l my-app
 if [ $? -ne 0 ]; then
     echo "Running package command failed."
     cd ..

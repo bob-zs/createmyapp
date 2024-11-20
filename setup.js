@@ -30,6 +30,9 @@ const baseAppDir = path.join(__dirname, 'base-app');
 const scriptName = path.basename(process.argv[1]);
 const appName = process.argv[2] || 'my-app';
 
+console.log(kleur.cyan(`baseAppDir: ${baseAppDir}`));  // Debug log
+console.log(kleur.cyan(`appName: ${appName}`));  // Debug log
+
 if (fs.existsSync(appName)) {
   console.error(`Error: Directory "${appName}" already exists. Please choose a different name.`);
   process.exit(1);
@@ -55,11 +58,8 @@ const copyRecursiveSync = (src, dest) => {
   for (let entry of entries) {
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
+    console.log(`Processing: ${srcPath}`);  // Debug log
     if (entry.name !== scriptName && !shouldIgnore(entry.name)) {
-      if (!fs.existsSync(srcPath)) {
-        console.log(`File not found: ${srcPath}`);
-        continue;
-      }
       entry.isDirectory() ? copyRecursiveSync(srcPath, destPath) : fs.copyFileSync(srcPath, destPath);
       console.log(`Copied: ${path.relative(baseAppDir, srcPath)}`);
     }
