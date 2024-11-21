@@ -3,6 +3,14 @@
 # Enable debugging
 set -x
 
+# Check if Docker is running and start if not
+if ! docker info > /dev/null 2>&1; then
+    echo "Starting Docker..."
+    open -a Docker || sudo systemctl start docker
+    echo "Waiting for Docker to start..."
+    sleep 30  # Adjust sleep duration if needed
+fi
+
 # Define variables
 VERDACCIO_IMAGE="verdaccio/verdaccio"
 VERDACCIO_CONTAINER_NAME="verdaccio"
@@ -14,13 +22,6 @@ PASSWORD="test_password"
 EMAIL="test@domain.com"
 TMP_DIR=$(mktemp -d)
 NPMRC_FILE="${TMP_DIR}/.npmrc"
-
-# Check if Docker is installed
-if ! command -v docker &> /dev/null
-then
-    echo "Docker could not be found. Please install Docker and try again."
-    exit 1
-fi
 
 # Stop and remove any existing Verdaccio container
 if [ "$(docker ps -q -f name=${VERDACCIO_CONTAINER_NAME})" ]; then
@@ -41,14 +42,6 @@ fi
 # Wait for Verdaccio to be ready
 echo "Waiting for Verdaccio to start..."
 sleep 10
-
-# Check if Verdaccio is running
-if ! curl -s ${REGISTRY_URL} > /dev/null; then
-    echo "Verdaccio is not running on ${REGISTRY_URL}. Exiting."
-    docker stop ${VERDACCIO_CONTAINER_NAME}
-    docker rm ${VERDACCIO_CONTAINER_NAME}
-    exit 1
-fi
 
 # Authenticate with Verdaccio using npm-cli-login
 echo "Authenticating with Verdaccio..."
@@ -87,12 +80,9 @@ cd ${TMP_DIR}/test-install
 # Setup .npmrc to use the Verdaccio registry for the scope
 echo "@bob-zs:registry=${REGISTRY_URL}" > ${NPMRC_FILE}
 
-# Print .npmrc for debugging
-cat ${NPMRC_FILE}
-
 # Run the package command directly using pnpx with the correct registry
 echo "Running package command..."
-pnpm dlx --package @bob-zs/createmyapp create-my-app my-app --registry=${REGISTRY_URL} && ls -l my-app
+pnpx create-my-app my-app && ls -l my-app
 if [ $? -ne 0 ]; then
     echo "Running package command failed."
     cd ..
