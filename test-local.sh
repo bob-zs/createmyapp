@@ -13,6 +13,7 @@ USERNAME="test"
 PASSWORD="test_password"
 EMAIL="test@domain.com"
 TMP_DIR=$(mktemp -d)
+NPMRC_FILE="${TMP_DIR}/.npmrc"
 
 # Check if Docker is installed
 if ! command -v docker &> /dev/null
@@ -83,9 +84,15 @@ fi
 mkdir ${TMP_DIR}/test-install
 cd ${TMP_DIR}/test-install
 
-# Run the package command directly
+# Setup .npmrc to use the Verdaccio registry for the scope
+echo "@bob-zs:registry=${REGISTRY_URL}" > ${NPMRC_FILE}
+
+# Print .npmrc for debugging
+cat ${NPMRC_FILE}
+
+# Run the package command directly using pnpx with the correct registry
 echo "Running package command..."
-pnpx -p ${PACKAGE_NAME} create-my-app my-app && ls -l my-app
+pnpm dlx --package @bob-zs/createmyapp create-my-app my-app --registry=${REGISTRY_URL} && ls -l my-app
 if [ $? -ne 0 ]; then
     echo "Running package command failed."
     cd ..

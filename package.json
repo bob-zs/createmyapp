@@ -22,6 +22,7 @@
     "kleur": "^4.1.5"
   },
   "devDependencies": {
-    "madge": "^8.0.0"
+    "madge": "^8.0.0",
+    "npm-cli-login": "^1.0.0"
   }
 }
