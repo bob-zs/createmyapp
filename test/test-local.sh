@@ -80,10 +80,13 @@ cd ${TMP_DIR}/test-install
 # Setup .npmrc to use the Verdaccio registry for the scope
 echo "@bob-zs:registry=${REGISTRY_URL}" > ${NPMRC_FILE}
 
-# Run the package command directly using pnpx with the correct registry
+# Run the package command directly using pnpx with the correct registry and capture output
 echo "Running package command..."
-pnpx create-my-app my-app && ls -l my-app
-if [ $? -ne 0 ]; then
+PACKAGE_OUTPUT=$(pnpx create-my-app my-app 2>&1)
+PACKAGE_EXIT_CODE=$?
+echo "Package command output:"
+echo "${PACKAGE_OUTPUT}"
+if [ ${PACKAGE_EXIT_CODE} -ne 0 ]; then
     echo "Running package command failed."
     cd ..
     rm -rf ${TMP_DIR}
@@ -91,6 +94,9 @@ if [ $? -ne 0 ]; then
     docker rm ${VERDACCIO_CONTAINER_NAME}
     exit 1
 fi
+
+# List the created directory
+ls -l my-app
 
 # Clean up
 cd ..
