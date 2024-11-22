@@ -3,7 +3,7 @@ import { runCommand } from './commands.js';
 import kleur from 'kleur';
 import fs from 'node:fs';
 
-const defaultIgnores = ['.git', 'node_modules', 'dist', '*.log', 'coverage', 'temp', '.npmignore'];
+const defaultIgnores = ['.git', 'gitignore', 'node_modules', 'dist'];
 
 export const setupProject = async (baseAppDir, appName, packageManager, scriptName) => {
   try {

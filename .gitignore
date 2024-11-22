@@ -1,10 +1,5 @@
 .DS_Store
-
 .npmrc
-
-
-
+my-app/
 notes
-
 node_modules/
-
