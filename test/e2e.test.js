@@ -6,6 +6,7 @@ const os = require('os');
 describe('E2E Testing', () => {
   const registryUrl = 'http://localhost:4873';
   const packageName = '@bob-zs/createmyapp';
+  const packageVersion = '0.3.0'; // Specify the correct version
   let verdaccioContainerId;
 
   beforeAll(() => {
@@ -70,9 +71,9 @@ describe('E2E Testing', () => {
     process.chdir(tempDir);
     console.log(`Current working directory: ${process.cwd()}`);
     
-    // Install the latest version of the package
+    // Install the specific version of the package
     try {
-      execSync(`pnpm add ${packageName}@latest --registry ${registryUrl}`, { stdio: 'inherit' });
+      execSync(`pnpm add ${packageName}@${packageVersion} --registry ${registryUrl}`, { stdio: 'inherit' });
     } catch (error) {
       console.error('Failed to install package:', error);
     }
