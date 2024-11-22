@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import kleur from 'kleur';
 import { Command } from 'commander';
-import enquirer from 'enquirer';
+import inquirer from 'inquirer';
 import { fileURLToPath } from 'url';
 
 const program = new Command();
@@ -30,7 +30,7 @@ const baseAppDir = path.join(__dirname, 'base-app');
 const scriptName = path.basename(process.argv[1]);
 const appName = process.argv[2] || 'my-app';
 
-console.log(kleur.cyan(`baseAppDir: ${baseAppDir}`));  // Debug log
+console.log(kleur.cyan(`baseAppDir: ${path.relative(process.cwd(), baseAppDir)}`));  // Print relative path
 console.log(kleur.cyan(`appName: ${appName}`));  // Debug log
 
 if (fs.existsSync(appName)) {
@@ -74,13 +74,17 @@ const copyRecursiveSync = (src, dest) => {
   }
 };
 
-(async () => {
-  const { packageManager } = await enquirer.prompt({
-    type: 'select',
+const promptUser = async () => {
+  return inquirer.prompt({
+    type: 'list',
     name: 'packageManager',
     message: 'Which package manager do you want to use?',
     choices: ['pnpm', 'npm'],
   });
+};
+
+const setupProject = async (packageManager) => {
+  runCommand(`${packageManager} --version`);
 
   try {
     runCommand(`${packageManager} --version`);
@@ -112,11 +116,24 @@ const copyRecursiveSync = (src, dest) => {
   runCommand('git add .');
   runCommand(`git commit -m "Initial commit from create-my-app for ${appName}"`);
 
-  function printEndingMessage() {
-    console.log(kleur.green('\nExpress app setup complete with custom configurations!'));
-    console.log(kleur.yellow('Run the following command to start the server:\n'));
-    console.log(kleur.blue(`cd ${appName} && ${packageManager} run start:dev\n`));
+  console.log(kleur.green('\nExpress app setup complete with custom configurations!'));
+  console.log(kleur.yellow('Run the following command to start the server:\n'));
+  console.log(kleur.blue(`cd ${appName} && ${packageManager} run start:dev\n`));
+};
+
+async function main() {
+  try {
+    const { packageManager } = await promptUser();
+    await setupProject(packageManager);
+  } catch (error) {
+    if (error.name === 'ExitPromptError') {
+      console.log("Prompt was interrupted. You can restart the setup by running the script again.");
+    } else {
+      console.error("Unexpected error:", error);
+    }
   }
 
-  printEndingMessage();
-})();
+  console.log('End of script');
+}
+
+main();
