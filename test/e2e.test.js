@@ -10,7 +10,6 @@ describe('E2E Testing', () => {
   let verdaccioContainerId;
 
   beforeAll(() => {
-    // Stop any existing Verdaccio containers
     try {
       execSync('docker ps -q --filter "ancestor=verdaccio/verdaccio" | xargs -r docker stop');
       execSync('docker ps -a -q --filter "ancestor=verdaccio/verdaccio" | xargs -r docker rm');
@@ -20,15 +19,26 @@ describe('E2E Testing', () => {
 
     // Start Verdaccio in Docker
     verdaccioContainerId = execSync(`docker run -d -p 4873:4873 verdaccio/verdaccio`).toString().trim();
+    console.log(`Verdaccio started with container ID: ${verdaccioContainerId}`);
+    
     // Wait for Verdaccio to be ready
+    console.log('Waiting for Verdaccio to be ready...');
     execSync('sleep 10');
     
     // Authenticate with Verdaccio using locally installed npm-cli-login
+    console.log('Authenticating with Verdaccio...');
     execSync(`pnpm exec npm-cli-login -u test -p test_password -e test@domain.com -r ${registryUrl}`);
     
-    // Publish the package
-    execSync(`pnpm publish --registry ${registryUrl}`);
+    try {
+      // Publish the package with verbose logging
+      console.log('Publishing package...');
+      execSync(`pnpm publish --registry ${registryUrl} --loglevel silly`);
+    } catch (error) {
+      console.error('Failed to publish package:', error);
+      throw error;
+    }
   });
+
 
   afterAll(() => {
     // Stop and remove Verdaccio container
