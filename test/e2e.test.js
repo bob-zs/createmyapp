@@ -70,9 +70,9 @@ describe('E2E Testing', () => {
     process.chdir(tempDir);
     console.log(`Current working directory: ${process.cwd()}`);
     
-    // Install the package
+    // Install the latest version of the package
     try {
-      execSync(`pnpm add ${packageName} --registry ${registryUrl}`, { stdio: 'inherit' });
+      execSync(`pnpm add ${packageName}@latest --registry ${registryUrl}`, { stdio: 'inherit' });
     } catch (error) {
       console.error('Failed to install package:', error);
     }
