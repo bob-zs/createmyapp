@@ -42,7 +42,7 @@ describe('E2E Testing', () => {
     // Publish the package
     console.log('Publishing package...');
     try {
-      const result = execSync(`pnpm publish --registry ${registryUrl} --no-git-checks --loglevel silly --yes`, { stdio: 'pipe' });
+      const result = execSync(`yes | pnpm publish --registry ${registryUrl} --no-git-checks --loglevel silly`, { stdio: 'pipe' });
       console.log(result.toString());
     } catch (error) {
       console.error('Failed to publish package:', error);
