@@ -42,7 +42,7 @@ describe('E2E Testing', () => {
     // Publish the package
     console.log('Publishing package...');
     try {
-      const result = execSync(`pnpm publish --registry ${registryUrl} --loglevel silly`, { stdio: 'pipe' });
+      const result = execSync(`pnpm publish --registry ${registryUrl} --no-git-checks --loglevel silly`, { stdio: 'pipe' });
       console.log(result.toString());
     } catch (error) {
       console.error('Failed to publish package:', error);
@@ -71,11 +71,11 @@ describe('E2E Testing', () => {
     console.log(`Current working directory: ${process.cwd()}`);
     
     // Install the package
-    execSync(`pnpm add ${packageName} --registry ${registryUrl}`);
+    execSync(`pnpm add ${packageName} --registry ${registryUrl} --cwd ${tempDir}`);
     
     // Run the package command
     try {
-      execSync(`pnpx create-my-app my-app`, { stdio: 'inherit' });
+      execSync(`pnpx create-my-app my-app --cwd ${tempDir}`, { stdio: 'inherit' });
     } catch (error) {
       console.error('Failed to run create-my-app:', error);
     }
