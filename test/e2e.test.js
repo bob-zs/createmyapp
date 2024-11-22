@@ -9,6 +9,18 @@ describe('E2E Testing', () => {
   let verdaccioContainerId;
 
   beforeAll(() => {
+    // Check for uncommitted changes
+    try {
+      const statusOutput = execSync('git status --porcelain').toString();
+      if (statusOutput) {
+        console.error('Uncommitted changes detected. Please commit your changes before running the test.');
+        process.exit(1);
+      }
+    } catch (error) {
+      console.error('Failed to check for uncommitted changes:', error);
+      process.exit(1);
+    }
+
     // Stop any existing Verdaccio containers
     try {
       execSync('docker ps -q --filter "ancestor=verdaccio/verdaccio" | xargs -r docker stop');
@@ -30,9 +42,16 @@ describe('E2E Testing', () => {
     // Publish the package
     console.log('Publishing package...');
     try {
-      execSync(`pnpm publish --registry ${registryUrl} --loglevel silly`);
+      const result = execSync(`pnpm publish --registry ${registryUrl} --loglevel silly`, { stdio: 'pipe' });
+      console.log(result.toString());
     } catch (error) {
       console.error('Failed to publish package:', error);
+      if (error.stdout) {
+        console.error('stdout:', error.stdout.toString());
+      }
+      if (error.stderr) {
+        console.error('stderr:', error.stderr.toString());
+      }
       throw error;
     }
   });
