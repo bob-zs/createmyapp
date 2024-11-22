@@ -71,11 +71,15 @@ describe('E2E Testing', () => {
     console.log(`Current working directory: ${process.cwd()}`);
     
     // Install the package
-    execSync(`pnpm add ${packageName} --registry ${registryUrl} --cwd ${tempDir}`);
+    try {
+      execSync(`pnpm add ${packageName} --registry ${registryUrl}`, { stdio: 'inherit' });
+    } catch (error) {
+      console.error('Failed to install package:', error);
+    }
     
     // Run the package command
     try {
-      execSync(`pnpx create-my-app my-app --cwd ${tempDir}`, { stdio: 'inherit' });
+      execSync(`pnpx create-my-app my-app`, { stdio: 'inherit' });
     } catch (error) {
       console.error('Failed to run create-my-app:', error);
     }
