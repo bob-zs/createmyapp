@@ -1,8 +1,7 @@
 const { execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
-
-const packageJsonPath = path.join(__dirname, 'package.json');
+const os = require('os');
 
 describe('E2E Testing', () => {
   const registryUrl = 'http://localhost:4873';
@@ -10,6 +9,7 @@ describe('E2E Testing', () => {
   let verdaccioContainerId;
 
   beforeAll(() => {
+    // Stop any existing Verdaccio containers
     try {
       execSync('docker ps -q --filter "ancestor=verdaccio/verdaccio" | xargs -r docker stop');
       execSync('docker ps -a -q --filter "ancestor=verdaccio/verdaccio" | xargs -r docker rm');
@@ -20,8 +20,6 @@ describe('E2E Testing', () => {
     // Start Verdaccio in Docker
     verdaccioContainerId = execSync(`docker run -d -p 4873:4873 verdaccio/verdaccio`).toString().trim();
     console.log(`Verdaccio started with container ID: ${verdaccioContainerId}`);
-    
-    // Wait for Verdaccio to be ready
     console.log('Waiting for Verdaccio to be ready...');
     execSync('sleep 10');
     
@@ -29,16 +27,15 @@ describe('E2E Testing', () => {
     console.log('Authenticating with Verdaccio...');
     execSync(`pnpm exec npm-cli-login -u test -p test_password -e test@domain.com -r ${registryUrl}`);
     
+    // Publish the package
+    console.log('Publishing package...');
     try {
-      // Publish the package with verbose logging
-      console.log('Publishing package...');
       execSync(`pnpm publish --registry ${registryUrl} --loglevel silly`);
     } catch (error) {
       console.error('Failed to publish package:', error);
       throw error;
     }
   });
-
 
   afterAll(() => {
     // Stop and remove Verdaccio container
@@ -47,16 +44,27 @@ describe('E2E Testing', () => {
   });
 
   test('should install and run package', () => {
-    const testDir = path.resolve(__dirname, 'test-install');
-    // Create a test directory
-    execSync(`mkdir -p ${testDir}`);
-    process.chdir(testDir);
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'test-install-'));
+    console.log(`Using temporary directory for test: ${tempDir}`);
+
+    // Switch to the temporary directory
+    process.chdir(tempDir);
+    console.log(`Current working directory: ${process.cwd()}`);
+    
     // Install the package
     execSync(`pnpm add ${packageName} --registry ${registryUrl}`);
+    
     // Run the package command
-    execSync(`pnpx create-my-app my-app`);
+    try {
+      execSync(`pnpx create-my-app my-app`, { stdio: 'inherit' });
+    } catch (error) {
+      console.error('Failed to run create-my-app:', error);
+    }
+    
     // Verify the directory and files are created
-    const appDir = path.resolve(testDir, 'my-app');
+    const appDir = path.resolve(tempDir, 'my-app');
+    console.log(`Checking if directory exists: ${appDir}`);
+    console.log(`Contents of tempDir: ${fs.readdirSync(tempDir)}`);
     expect(fs.existsSync(appDir)).toBe(true);
     expect(fs.readdirSync(appDir).length).toBeGreaterThan(0);
   });
