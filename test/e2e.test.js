@@ -1,135 +1,134 @@
-const { execSync } = require('child_process');
-const path = require('path');
-const fs = require('fs');
+'use strict';
+
+const execa = require('execa');
+const { mkdirp, writeFileSync, existsSync, readdirSync } = require('fs-extra');
+const { join, resolve } = require('path');
+const { rmSync, mkdtempSync, readdirSync, statSync } = require('fs');
 const os = require('os');
 
-describe('E2E Testing', () => {
-  const registryUrl = 'http://localhost:4873';
-  const packageName = '@bob-zs/createmyapp';
-  const packageVersion = '0.3.0'; // Specify the correct version
-  let verdaccioContainerId;
+jest.setTimeout(1000 * 60 * (process.env.RUNNER_OS === 'macOS' ? 10 : 5));
 
-  beforeAll(() => {
-    // Check for uncommitted changes
-    try {
-      const statusOutput = execSync('git status --porcelain').toString();
-      if (statusOutput) {
-        console.error('Uncommitted changes detected. Please commit your changes before running the test.');
-        process.exit(1);
-      }
-    } catch (error) {
-      console.error('Failed to check for uncommitted changes:', error);
+const registryUrl = 'http://localhost:4873';
+const packageName = '@bob-zs/createmyapp';
+const packageVersion = '0.3.0'; // Specify the correct version
+
+const projectName = 'my-app';
+const tempDir = mkdtempSync(join(os.tmpdir(), 'test-install-'));
+const genPath = join(tempDir, projectName);
+
+beforeAll(async () => {
+  // Check for uncommitted changes
+  try {
+    const statusOutput = await execa.command('git status --porcelain');
+    if (statusOutput.stdout) {
+      console.error('Uncommitted changes detected. Please commit your changes before running the test.');
       process.exit(1);
     }
+  } catch (error) {
+    console.error('Failed to check for uncommitted changes:', error);
+    process.exit(1);
+  }
 
-    // Stop any existing Verdaccio containers
-    try {
-      execSync('docker ps -q --filter "ancestor=verdaccio/verdaccio" | xargs -r docker stop');
-      execSync('docker ps -a -q --filter "ancestor=verdaccio/verdaccio" | xargs -r docker rm');
-    } catch (error) {
-      console.log('No existing Verdaccio containers found.');
+  // Stop any existing Verdaccio containers
+  try {
+    await execa.command('docker ps -q --filter "ancestor=verdaccio/verdaccio" | xargs -r docker stop');
+    await execa.command('docker ps -a -q --filter "ancestor=verdaccio/verdaccio" | xargs -r docker rm');
+  } catch (error) {
+    console.log('No existing Verdaccio containers found.');
+  }
+
+  // Start Verdaccio in Docker
+  const verdaccioContainer = await execa.command('docker run -d -p 4873:4873 verdaccio/verdaccio');
+  console.log(`Verdaccio started with container ID: ${verdaccioContainer.stdout.trim()}`);
+  console.log('Waiting for Verdaccio to be ready...');
+  await new Promise(resolve => setTimeout(resolve, 20000)); // Increased wait time
+
+  // Authenticate with Verdaccio using locally installed npm-cli-login
+  console.log('Authenticating with Verdaccio...');
+  await execa.command(`pnpm exec npm-cli-login -u test -p test_password -e test@domain.com -r ${registryUrl}`);
+
+  // Publish the package
+  console.log('Publishing package...');
+  try {
+    const result = await execa.command(`yes | pnpm publish --registry ${registryUrl} --no-git-checks --loglevel silly`);
+    console.log(result.stdout);
+  } catch (error) {
+    console.error('Failed to publish package:', error);
+    throw error;
+  }
+});
+
+afterAll(async () => {
+  // Stop and remove Verdaccio container
+  try {
+    const verdaccioContainer = await execa.command('docker ps -q --filter "ancestor=verdaccio/verdaccio"');
+    if (verdaccioContainer.stdout) {
+      await execa.command(`docker stop ${verdaccioContainer.stdout.trim()}`);
+      await execa.command(`docker rm ${verdaccioContainer.stdout.trim()}`);
     }
+  } catch (error) {
+    console.error('Failed to stop or remove Verdaccio container:', error);
+  }
+});
 
-    // Start Verdaccio in Docker
-    verdaccioContainerId = execSync(`docker run -d -p 4873:4873 verdaccio/verdaccio`).toString().trim();
-    console.log(`Verdaccio started with container ID: ${verdaccioContainerId}`);
-    console.log('Waiting for Verdaccio to be ready...');
-    execSync('sleep 20'); // Increased wait time
+const run = async (args, options) => {
+  process.stdout.write(
+    `::group::Test "${
+      expect.getState().currentTestName
+    }" - "pnpm dlx ${args.join(' ')}" output:\n`
+  );
+  const result = execa('pnpm', ['dlx'].concat(args), options);
+  result.stdout.on('data', chunk =>
+    process.stdout.write(chunk.toString('utf8'))
+  );
+  result.stderr.on('data', chunk =>
+    process.stderr.write(chunk.toString('utf8'))
+  );
+  const childProcessResult = await result;
+  process.stdout.write(`ExitCode: ${childProcessResult.exitCode}\n`);
+  process.stdout.write('::endgroup::\n');
+  const files = existsSync(genPath)
+    ? readdirSync(genPath).filter(f => existsSync(join(genPath, f)))
+    : null;
+  return {
+    ...childProcessResult,
+    files,
+  };
+};
 
-    // Authenticate with Verdaccio using locally installed npm-cli-login
-    console.log('Authenticating with Verdaccio...');
-    execSync(`pnpm exec npm-cli-login -u test -p test_password -e test@domain.com -r ${registryUrl}`);
+const expectAllFiles = (arr1, arr2) =>
+  expect([...arr1].sort()).toEqual([...arr2].sort());
 
-    // Publish the package
-    console.log('Publishing package...');
-    try {
-      const result = execSync(`yes | pnpm publish --registry ${registryUrl} --no-git-checks --loglevel silly`, { stdio: 'pipe' });
-      console.log(result.toString());
-    } catch (error) {
-      console.error('Failed to publish package:', error);
-      if (error.stdout) {
-        console.error('stdout:', error.stdout.toString());
-      }
-      if (error.stderr) {
-        console.error('stderr:', error.stderr.toString());
-      }
-      throw error;
-    }
-  });
-
-  afterAll(() => {
-    // Stop and remove Verdaccio container
-    execSync(`docker stop ${verdaccioContainerId}`);
-    execSync(`docker rm ${verdaccioContainerId}`);
-  });
-
-  test('should install and run package', () => {
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'test-install-'));
+describe('create-my-app', () => {
+  it('should create a project with pnpm dlx', async () => {
     console.log(`Using temporary directory for test: ${tempDir}`);
-
-    // Switch to the temporary directory
     process.chdir(tempDir);
     console.log(`Current working directory: ${process.cwd()}`);
 
-    // Install the specific version of the package
-    try {
-      execSync(`pnpm add -g ${packageName}@${packageVersion} --registry ${registryUrl}`, { stdio: 'inherit' });
-      console.log(`Successfully installed ${packageName}@${packageVersion}`);
-    } catch (error) {
-      console.error('Failed to install package:', error);
-      throw error;
+    const { exitCode, stdout, stderr, files } = await run([`${packageName}@${packageVersion}`, projectName], {
+      cwd: tempDir,
+    });
+
+    if (exitCode !== 0) {
+      console.error('pnpm dlx command failed:', stdout, stderr);
     }
 
-    // Verify pnpm and pnpm dlx is available
-    try {
-      const pnpmVersion = execSync('pnpm --version').toString().trim();
-      console.log(`pnpm version: ${pnpmVersion}`);
-      const pnpmDlqVersion = execSync('pnpm dlx --version').toString().trim();
-      console.log(`pnpm dlx version: ${pnpmDlqVersion}`);
-    } catch (error) {
-      console.error('pnpm or pnpm dlx is not available:', error);
-      throw error;
-    }
+    expect(exitCode).toBe(0);
 
-    // Run the package command using pnpm dlx
-    try {
-      console.log('Running create-my-app command...');
-      const result = execSync(`pnpm dlx ${packageName}@${packageVersion} my-app`, { stdio: 'pipe' });
-      console.log('create-my-app command output:', result.toString());
-      console.log('create-my-app command executed successfully');
-    } catch (error) {
-      console.error('Failed to run create-my-app:', error);
-      if (error.stdout) {
-        console.error('stdout:', error.stdout.toString());
-      }
-      if (error.stderr) {
-        console.error('stderr:', error.stderr.toString());
-      }
-      throw error;
-    }
+    console.log(`Checking if directory exists: ${genPath}`);
+    console.log(`Contents of tempDir: ${readdirSync(tempDir)}`);
 
-    // Verify the directory and files are created
-    const appDir = path.resolve(tempDir, 'my-app');
-    console.log(`Checking if directory exists: ${appDir}`);
-    console.log(`Contents of tempDir: ${fs.readdirSync(tempDir)}`);
-
-    // Detailed directory contents for debugging
-    const tempDirContents = fs.readdirSync(tempDir);
+    const tempDirContents = readdirSync(tempDir);
     tempDirContents.forEach(file => {
-      const fullPath = path.join(tempDir, file);
-      const stats = fs.statSync(fullPath);
+      const fullPath = join(tempDir, file);
+      const stats = statSync(fullPath);
       console.log(`${file}: ${stats.isDirectory() ? 'directory' : 'file'}, ${stats.size} bytes`);
     });
 
-    expect(fs.existsSync(appDir)).toBe(true);
-    expect(fs.readdirSync(appDir).length).toBeGreaterThan(0);
+    expect(fs.existsSync(genPath)).toBe(true);
+    expect(readdirSync(genPath).length).toBeGreaterThan(0);
 
-    // Additional logging for the contents of my-app directory
-    if (fs.existsSync(appDir)) {
-      const appDirContents = fs.readdirSync(appDir);
-      console.log(`Contents of appDir: ${appDirContents.join(', ')}`);
-    } else {
-      console.error('Directory my-app was not created.');
-    }
+    const genPathContents = existsSync(genPath) ? readdirSync(genPath) : [];
+    console.log(`Contents of genPath: ${genPathContents.join(', ')}`);
   });
 });
