@@ -81,6 +81,7 @@ describe('E2E Testing', () => {
 
     // Run the package command
     try {
+      console.log('Running create-my-app command...');
       execSync(`pnpx create-my-app my-app`, { stdio: 'inherit' });
     } catch (error) {
       console.error('Failed to run create-my-app:', error);
@@ -104,7 +105,11 @@ describe('E2E Testing', () => {
     expect(fs.readdirSync(appDir).length).toBeGreaterThan(0);
 
     // Additional logging for the contents of my-app directory
-    const appDirContents = fs.existsSync(appDir) ? fs.readdirSync(appDir) : [];
-    console.log(`Contents of appDir: ${appDirContents.join(', ')}`);
+    if (fs.existsSync(appDir)) {
+      const appDirContents = fs.readdirSync(appDir);
+      console.log(`Contents of appDir: ${appDirContents.join(', ')}`);
+    } else {
+      console.error('Directory my-app was not created.');
+    }
   });
 });
