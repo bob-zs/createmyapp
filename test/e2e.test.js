@@ -70,7 +70,7 @@ describe('E2E Testing', () => {
     // Switch to the temporary directory
     process.chdir(tempDir);
     console.log(`Current working directory: ${process.cwd()}`);
-    
+
     // Install the specific version of the package
     try {
       execSync(`pnpm add -g ${packageName}@${packageVersion} --registry ${registryUrl}`, { stdio: 'inherit' });
@@ -102,5 +102,9 @@ describe('E2E Testing', () => {
 
     expect(fs.existsSync(appDir)).toBe(true);
     expect(fs.readdirSync(appDir).length).toBeGreaterThan(0);
+
+    // Additional logging for the contents of my-app directory
+    const appDirContents = fs.existsSync(appDir) ? fs.readdirSync(appDir) : [];
+    console.log(`Contents of appDir: ${appDirContents.join(', ')}`);
   });
 });
