@@ -73,7 +73,7 @@ describe('E2E Testing', () => {
     
     // Install the specific version of the package
     try {
-      execSync(`pnpm add ${packageName}@${packageVersion} --registry ${registryUrl}`, { stdio: 'inherit' });
+      execSync(`pnpm add -g ${packageName}@${packageVersion} --registry ${registryUrl}`, { stdio: 'inherit' });
     } catch (error) {
       console.error('Failed to install package:', error);
     }
