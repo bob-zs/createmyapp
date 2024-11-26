@@ -34,12 +34,12 @@ describe('E2E Testing', () => {
     verdaccioContainerId = execSync(`docker run -d -p 4873:4873 verdaccio/verdaccio`).toString().trim();
     console.log(`Verdaccio started with container ID: ${verdaccioContainerId}`);
     console.log('Waiting for Verdaccio to be ready...');
-    execSync('sleep 10');
-    
+    execSync('sleep 20'); // Increased wait time
+
     // Authenticate with Verdaccio using locally installed npm-cli-login
     console.log('Authenticating with Verdaccio...');
     execSync(`pnpm exec npm-cli-login -u test -p test_password -e test@domain.com -r ${registryUrl}`);
-    
+
     // Publish the package
     console.log('Publishing package...');
     try {
@@ -76,15 +76,17 @@ describe('E2E Testing', () => {
       execSync(`pnpm add -g ${packageName}@${packageVersion} --registry ${registryUrl}`, { stdio: 'inherit' });
     } catch (error) {
       console.error('Failed to install package:', error);
+      throw error;
     }
-    
+
     // Run the package command
     try {
       execSync(`pnpx create-my-app my-app`, { stdio: 'inherit' });
     } catch (error) {
       console.error('Failed to run create-my-app:', error);
+      throw error;
     }
-    
+
     // Verify the directory and files are created
     const appDir = path.resolve(tempDir, 'my-app');
     console.log(`Checking if directory exists: ${appDir}`);
