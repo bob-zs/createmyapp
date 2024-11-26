@@ -83,10 +83,17 @@ describe('E2E Testing', () => {
     // Run the package command using pnpm dlx
     try {
       console.log('Running create-my-app command...');
-      execSync(`pnpm dlx ${packageName}@${packageVersion} my-app`, { stdio: 'inherit' });
+      const result = execSync(`pnpm dlx ${packageName}@${packageVersion} my-app`, { stdio: 'pipe' });
+      console.log('create-my-app command output:', result.toString());
       console.log('create-my-app command executed successfully');
     } catch (error) {
       console.error('Failed to run create-my-app:', error);
+      if (error.stdout) {
+        console.error('stdout:', error.stdout.toString());
+      }
+      if (error.stderr) {
+        console.error('stderr:', error.stderr.toString());
+      }
       throw error;
     }
 
