@@ -74,8 +74,18 @@ describe('E2E Testing', () => {
     // Install the specific version of the package
     try {
       execSync(`pnpm add -g ${packageName}@${packageVersion} --registry ${registryUrl}`, { stdio: 'inherit' });
+      console.log(`Successfully installed ${packageName}@${packageVersion}`);
     } catch (error) {
       console.error('Failed to install package:', error);
+      throw error;
+    }
+
+    // Verify pnpx is available
+    try {
+      const pnpxVersion = execSync('pnpx --version').toString().trim();
+      console.log(`pnpx version: ${pnpxVersion}`);
+    } catch (error) {
+      console.error('pnpx is not available:', error);
       throw error;
     }
 
@@ -83,6 +93,7 @@ describe('E2E Testing', () => {
     try {
       console.log('Running create-my-app command...');
       execSync(`pnpx create-my-app my-app`, { stdio: 'inherit' });
+      console.log('create-my-app command executed successfully');
     } catch (error) {
       console.error('Failed to run create-my-app:', error);
       throw error;
