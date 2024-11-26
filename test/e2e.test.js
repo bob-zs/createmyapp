@@ -80,6 +80,17 @@ describe('E2E Testing', () => {
       throw error;
     }
 
+    // Verify pnpm and pnpm dlx is available
+    try {
+      const pnpmVersion = execSync('pnpm --version').toString().trim();
+      console.log(`pnpm version: ${pnpmVersion}`);
+      const pnpmDlqVersion = execSync('pnpm dlx --version').toString().trim();
+      console.log(`pnpm dlx version: ${pnpmDlqVersion}`);
+    } catch (error) {
+      console.error('pnpm or pnpm dlx is not available:', error);
+      throw error;
+    }
+
     // Run the package command using pnpm dlx
     try {
       console.log('Running create-my-app command...');
