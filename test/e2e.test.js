@@ -91,6 +91,15 @@ describe('E2E Testing', () => {
     const appDir = path.resolve(tempDir, 'my-app');
     console.log(`Checking if directory exists: ${appDir}`);
     console.log(`Contents of tempDir: ${fs.readdirSync(tempDir)}`);
+
+    // Detailed directory contents for debugging
+    const tempDirContents = fs.readdirSync(tempDir);
+    tempDirContents.forEach(file => {
+      const fullPath = path.join(tempDir, file);
+      const stats = fs.statSync(fullPath);
+      console.log(`${file}: ${stats.isDirectory() ? 'directory' : 'file'}, ${stats.size} bytes`);
+    });
+
     expect(fs.existsSync(appDir)).toBe(true);
     expect(fs.readdirSync(appDir).length).toBeGreaterThan(0);
   });
