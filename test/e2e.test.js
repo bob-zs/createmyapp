@@ -3,7 +3,7 @@
 const execa = require('execa');
 const { mkdirp, writeFileSync, existsSync, readdirSync } = require('fs-extra');
 const { join, resolve } = require('path');
-const { rmSync, mkdtempSync, readdirSync, statSync } = require('fs');
+const { rmSync, mkdtempSync, statSync } = require('fs');
 const os = require('os');
 
 jest.setTimeout(1000 * 60 * (process.env.RUNNER_OS === 'macOS' ? 10 : 5));
