@@ -80,19 +80,10 @@ describe('E2E Testing', () => {
       throw error;
     }
 
-    // Verify pnpx is available
-    try {
-      const pnpxVersion = execSync('pnpx --version').toString().trim();
-      console.log(`pnpx version: ${pnpxVersion}`);
-    } catch (error) {
-      console.error('pnpx is not available:', error);
-      throw error;
-    }
-
-    // Run the package command
+    // Run the package command using pnpm dlx
     try {
       console.log('Running create-my-app command...');
-      execSync(`pnpx create-my-app my-app`, { stdio: 'inherit' });
+      execSync(`pnpm dlx ${packageName}@${packageVersion} my-app`, { stdio: 'inherit' });
       console.log('create-my-app command executed successfully');
     } catch (error) {
       console.error('Failed to run create-my-app:', error);
