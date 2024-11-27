@@ -1,7 +1,8 @@
 const path = require('path');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
-const createMyApp = require('../createMyApp');
+
+const createMyAppExecPath = path.join(__dirname, '..', 'main.js')
 
 describe('jest', () => {
   it('basically still works', () => {
@@ -15,7 +16,7 @@ describe('jest', () => {
 
 describe('createMyApp', () => {
   it('can output version number', async () => {
-    const { stdout } = await exec(`node ${createMyApp} --version`);
-    // expect(stdout.trim()).toMatch(/createmyapp\nversion: \d+\.\d+\.\d+/);
+    const { stdout } = await exec(`node ${createMyAppExecPath} --version`);
+    expect(stdout.trim()).toMatch(/createmyapp\nversion: \d+\.\d+\.\d+/);
   });
 });
