@@ -13,22 +13,21 @@ const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 const packageName = packageJson.name.split('/')[1];
 const version = packageJson.version;
 
-program.version(`${packageName}\nversion: ${version}`, '-v, --version', 'output the version number'); 
-program.parse(process.argv);
-
-const baseAppDir = path.join(__dirname, 'base-app');
-const scriptName = path.basename(process.argv[1]);
-const appName = process.argv[2] || 'my-app';
-
-console.log(kleur.cyan(`baseAppDir: ${path.relative(process.cwd(), baseAppDir)}`));  // Print relative path
-console.log(kleur.cyan(`appName: ${appName}`));  // Debug log
-
-if (fs.existsSync(appName)) {
-  console.error(`Error: Directory "${appName}" already exists. Please choose a different name.`);
-  process.exit(1);
-}
-
 module.exports = async () => {
+  program.version(`${packageName}\nversion: ${version}`, '-v, --version', 'output the version number'); 
+  program.parse(process.argv);
+
+  const baseAppDir = path.join(__dirname, 'base-app');
+  const scriptName = path.basename(process.argv[1]);
+  const appName = process.argv[2] || 'my-app';
+
+  console.log(kleur.cyan(`baseAppDir: ${path.relative(process.cwd(), baseAppDir)}`));  // Print relative path
+  console.log(kleur.cyan(`appName: ${appName}`));  // Debug log
+
+  if (fs.existsSync(appName)) {
+    console.error(`Error: Directory "${appName}" already exists. Please choose a different name.`);
+    process.exit(1);
+  }
   try {
     const { packageManager } = await promptUser();
     await setupProject(baseAppDir, appName, packageManager, scriptName);

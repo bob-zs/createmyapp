@@ -1,6 +1,5 @@
 'use strict';
 
-// const { execa } = require('execa');
 // const { mkdirSync, writeFileSync, existsSync, readdirSync, rmSync } = require('fs');
 // const { join } = require('path');
 // const { describe, expect, it, beforeAll, afterAll, jest } = require('@jest/globals');
@@ -13,19 +12,13 @@ describe('jest', () => {
   it('basically still works', () => {
     expect(true).toBe(true);
   });
-
   it('can run a shell command', async () => {
-    const msg = 'hello';
-    const { stdout, stderr } = await exec(`echo ${msg}`);
-    // Trim stdout to remove any extra whitespace or newline characters
-    expect(stdout.trim()).toBe(msg);
+    const { stdout } = await exec('echo hello');
+    expect(stdout.trim()).toBe('hello');
   });
 });
 
-
-
-
-// const createmyappCLI = require('../createMyApp');
+const createmyappCLI = require('../createMyApp');
 
 // Set longer timeout for tests
 // jest.setTimeout(1000 * 60 * (process.env.RUNNER_OS === 'macOS' ? 10 : 5));
