@@ -16,7 +16,7 @@ describe('jest', () => {
 
 describe('createMyApp', () => {
   it('can output version number', async () => {
-    const { stdout } = await exec(`node ${createMyAppExecPath} --version`);
+    const { stdout } = await exec(`pnpx ${createMyAppExecPath} --version`);
     expect(stdout.trim()).toMatch(/createmyapp\nversion: \d+\.\d+\.\d+/);
   });
 });
