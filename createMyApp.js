@@ -10,18 +10,11 @@ const program = new Command();
 
 const packageJsonPath = path.join(__dirname, 'package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+const packageName = packageJson.name.split('/')[1];
 const version = packageJson.version;
 
-program
-  .version(version)
-  .option('-v, --ver', 'output the version number');
-
+program.version(`${packageName}\nversion: ${version}`, '-v, --version', 'output the version number'); 
 program.parse(process.argv);
-const options = program.opts();
-if (options.ver) {
-  console.log(`create-my-app version: ${version}\n`);
-  process.exit(0);
-}
 
 const baseAppDir = path.join(__dirname, 'base-app');
 const scriptName = path.basename(process.argv[1]);
