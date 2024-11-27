@@ -38,5 +38,4 @@ module.exports = async () => {
       console.error("Unexpected error:", error);
     }
   }
-  console.log('End of script');
 };
