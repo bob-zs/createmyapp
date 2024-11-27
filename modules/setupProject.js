@@ -1,7 +1,7 @@
-import { copyRecursiveSync, shouldIgnore } from './fileOperations.js';
-import { runCommand } from './commands.js';
-import kleur from 'kleur';
-import fs from 'node:fs';
+const { copyRecursiveSync, shouldIgnore } = require('./fileOperations.js');
+const { runCommand } = require('./commands.js');
+const kleur = require('kleur');
+const fs = require('node:fs');
 
 const defaultIgnores = ['.git', 'gitignore', 'node_modules', 'dist'];
 

@@ -1,13 +1,11 @@
 #!/usr/bin/env node
-import fs from 'node:fs';
-import path from 'node:path';
-import kleur from 'kleur';
-
-import { Command } from 'commander';
-import { fileURLToPath } from 'url';
-
-import { promptUser } from './modules/userInteraction.js';
-import { setupProject } from './modules/setupProject.js';
+const fs = require('node:fs');
+const path = require('node:path');
+const kleur = require('kleur');
+const { Command } = require('commander');
+const { fileURLToPath } = require('url');
+const { promptUser } = require('./modules/userInteraction.js');
+const { setupProject } = require('./modules/setupProject.js');
 
 const program = new Command();
 const __filename = fileURLToPath(import.meta.url);

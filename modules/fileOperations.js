@@ -1,5 +1,5 @@
-import fs from 'node:fs';
-import path from 'node:path';
+const fs = require('node:fs');
+const path = require('node:path');
 
 export const copyRecursiveSync = (src, dest, scriptName, shouldIgnore) => {
   const entries = fs.readdirSync(src, { withFileTypes: true });

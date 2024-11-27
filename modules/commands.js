@@ -1,5 +1,5 @@
-import { execSync } from 'node:child_process';
-import kleur from 'kleur';
+const { execSync } = require('node:child_process');
+const kleur = require('kleur');
 
 export const runCommand = command => {
   console.log(kleur.cyan(`Running: ${command}`));
