@@ -20,6 +20,13 @@ describe('jest', () => {
 
 const createmyappCLI = require('../createMyApp');
 
+describe('createMyApp', () => {
+  it('can output version number', async () => {
+    const { stdout } = await exec(`node ${createmyappCLI} --version`);
+    expect(stdout.trim()).toMatch(/createmyapp\nversion: \d+\.\d+\.\d+/);
+  });
+});
+
 // Set longer timeout for tests
 // jest.setTimeout(1000 * 60 * (process.env.RUNNER_OS === 'macOS' ? 10 : 5));
 
