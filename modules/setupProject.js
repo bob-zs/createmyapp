@@ -5,7 +5,7 @@ const fs = require('node:fs');
 
 const defaultIgnores = ['.git', 'gitignore', 'node_modules', 'dist'];
 
-export const setupProject = async (baseAppDir, appName, packageManager, scriptName) => {
+const setupProject = async (baseAppDir, appName, packageManager, scriptName) => {
   try {
     runCommand(`${packageManager} --version`);
   } catch (e) {
@@ -40,3 +40,5 @@ export const setupProject = async (baseAppDir, appName, packageManager, scriptNa
   console.log(kleur.yellow('Run the following command to start the server:\n'));
   console.log(kleur.blue(`cd ${appName} && ${packageManager} run start:dev\n`));
 };
+
+module.exports = { setupProject };

@@ -1,7 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-export const copyRecursiveSync = (src, dest, scriptName, shouldIgnore) => {
+const copyRecursiveSync = (src, dest, scriptName, shouldIgnore) => {
   const entries = fs.readdirSync(src, { withFileTypes: true });
   if (!fs.existsSync(dest)) {
     fs.mkdirSync(dest);
@@ -26,6 +26,8 @@ export const copyRecursiveSync = (src, dest, scriptName, shouldIgnore) => {
   }
 };
 
-export const shouldIgnore = (name, defaultIgnores) => {
+const shouldIgnore = (name, defaultIgnores) => {
   return defaultIgnores.some(ignore => name.startsWith(ignore.replace('*', '')));
 };
+
+module.exports = { copyRecursiveSync, shouldIgnore };

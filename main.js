@@ -1,15 +1,12 @@
 #!/usr/bin/env node
-const fs = require('node:fs');
-const path = require('node:path');
+const fs = require('fs');
+const path = require('path');
 const kleur = require('kleur');
 const { Command } = require('commander');
-const { fileURLToPath } = require('url');
-const { promptUser } = require('./modules/userInteraction.js');
-const { setupProject } = require('./modules/setupProject.js');
+const { promptUser } = require('./modules/userInteraction');
+const { setupProject } = require('./modules/setupProject');
 
 const program = new Command();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const packageJsonPath = path.join(__dirname, 'package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
