@@ -3,6 +3,8 @@ const fs = require('fs');
 const os = require('os');
 const { execSync } = require('child_process');
 
+const createMyApp = path.join(__dirname, '..', 'main.js');
+
 describe('createMyApp', () => {
   const originalDir = process.cwd();
   let tempDir;
@@ -26,19 +28,18 @@ describe('createMyApp', () => {
   it('should create a new app', () => {
     try {
       process.chdir(tempDir);
-
-      // Confirm we are in the temporary directory (normalize paths)
       const currentNormalizedPath = fs.realpathSync(process.cwd());
       const tempNormalizedPath = fs.realpathSync(tempDir);
       expect(currentNormalizedPath).toBe(tempNormalizedPath);
 
-      // Run the createMyApp command
-      // execSync('npx createMyApp new-app', { stdio: 'inherit' });
+      // Set the PACKAGE_MANAGER environment variable for testing
+      execSync(`node ${createMyApp} new-app`, {
+        stdio: 'inherit',
+        env: { ...process.env, PACKAGE_MANAGER: 'npm' }
+      });
 
-      // Verify the new app was created
-      // const appPath = path.join(tempDir, 'new-app');
-      // expect(fs.existsSync(appPath)).toBe(true);
-      // Add more assertions as needed
+      const appPath = path.join(tempDir, 'new-app');
+      expect(fs.existsSync(appPath)).toBe(true);
 
     } finally {
       process.chdir(originalDir);

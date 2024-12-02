@@ -14,7 +14,7 @@ const packageName = packageJson.name.split('/')[1];
 const version = packageJson.version;
 
 module.exports = async () => {
-  program.version(`${packageName}\nversion: ${version}`, '-v, --version', 'output the version number'); 
+  program.version(`${packageName}\nversion: ${version}`, '-v, --version', 'output the version number');
   program.parse(process.argv);
 
   const baseAppDir = path.join(__dirname, 'base-app');
@@ -22,14 +22,20 @@ module.exports = async () => {
   const appName = process.argv[2] || 'my-app';
 
   console.log(kleur.cyan(`baseAppDir: ${path.relative(process.cwd(), baseAppDir)}`));
-  console.log(kleur.cyan(`appName: ${appName}`));  // Debug log
+  console.log(kleur.cyan(`appName: ${appName}`));
 
   if (fs.existsSync(appName)) {
     console.error(`Error: Directory "${appName}" already exists. Please choose a different name.`);
     process.exit(1);
   }
+
+  let packageManager = process.env.PACKAGE_MANAGER;
+  if (!packageManager) {
+    const response = await promptUser();
+    packageManager = response.packageManager;
+  }
+
   try {
-    const { packageManager } = await promptUser();
     await setupProject(baseAppDir, appName, packageManager, scriptName);
   } catch (error) {
     if (error.name === 'ExitPromptError') {
