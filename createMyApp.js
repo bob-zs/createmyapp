@@ -21,7 +21,7 @@ module.exports = async () => {
   const scriptName = path.basename(process.argv[1]);
   const appName = process.argv[2] || 'my-app';
 
-  console.log(kleur.cyan(`baseAppDir: ${path.relative(process.cwd(), baseAppDir)}`));  // Print relative path
+  console.log(kleur.cyan(`baseAppDir: ${path.relative(process.cwd(), baseAppDir)}`));
   console.log(kleur.cyan(`appName: ${appName}`));  // Debug log
 
   if (fs.existsSync(appName)) {
