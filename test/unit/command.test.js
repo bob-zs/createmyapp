@@ -1,6 +1,6 @@
 const { execSync } = require('node:child_process');
 const kleur = require('kleur');
-const { runCommand } = require('../modules/commands');
+const { runCommand } = require('../../modules/commands');
 
 describe('runCommand', () => {
   let originalLog;
