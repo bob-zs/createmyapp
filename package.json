@@ -7,7 +7,7 @@
   },
   "scripts": {
     "test:unit": "jest test/unit/*",
-    "test:unit:debug": "pnpm run test:unit -- --silent=false",
+    "test:unit:debug": "pnpm run test:unit -- --silent=false --watch",
     "test:e2e": "jest test/e2e.test.js"
   },
   "keywords": [],
