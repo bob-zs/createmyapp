@@ -17,11 +17,12 @@ describe('runCommand', () => {
     console.error = (output) => errorLogs.push(output);
   });
 
-  it('should log the correct command with kleur and execute it', () => {
+  it('should log the correct command with kleur, execute it, and capture the output', () => {
     const command = 'echo "Hello, World!"';
+    const output = execSync(command, { shell: '/bin/bash' }).toString().trim();
     runCommand(command);
     expect(logs).toContain(kleur.cyan(`Running: ${command}`));
-    console.log = originalLog;
+    expect(output).toBe('Hello, World!');
   });
 
   it('should log an error message if the command fails', () => {
@@ -32,51 +33,43 @@ describe('runCommand', () => {
       // Expected to fail
     }
     expect(errorLogs).toContain(kleur.red(`Failed to execute command: ${command}`));
-    console.log = originalLog;
-    console.error = originalErrorLog;
   });
 
-  it('should handle commands with multiple arguments', () => {
+  it('should handle commands with multiple arguments and capture output', () => {
     const command = 'echo "Hello," "World!"';
+    const output = execSync(command, { shell: '/bin/bash' }).toString().trim();
     runCommand(command);
     expect(logs).toContain(kleur.cyan(`Running: ${command}`));
-    console.log = originalLog;
+    expect(output).toBe('Hello, World!');
   });
 
   it('should handle long running commands', () => {
-    const command = 'sleep 2'; // Sleep for 2 seconds
+    const command = 'sleep 2';
     runCommand(command);
     expect(logs).toContain(kleur.cyan(`Running: ${command}`));
-    console.log = originalLog;
   });
 
-  it('should capture and handle command output', () => {
-    const command = 'echo "Command Output"';
-    runCommand(command);
-    expect(logs).toContain(kleur.cyan(`Running: ${command}`));
-    expect(logs.some(log => log.includes('Command Output'))).toBe(true);
-    console.log = originalLog;
-  });
-
-  xit('should handle commands with environment variables', () => {
+  it('should handle commands with environment variables and capture output', () => {
     process.env.TEST_VAR = 'Hello, World!';
     const command = 'echo $TEST_VAR';
-    runCommand(command);
-    expect(logs).toContain(kleur.cyan(`Running: ${command}`));
+    const fullCommand = `TEST_VAR="${process.env.TEST_VAR}" ${command}`;
+    const output = execSync(fullCommand, { shell: '/bin/bash' }).toString().trim();
+    runCommand(fullCommand);
+    expect(logs).toContain(kleur.cyan(`Running: ${fullCommand}`));
     expect(logs.some(log => log.includes('Hello, World!'))).toBe(true);
-    console.log = originalLog;
   });
 
-  it('should handle multiple commands in sequence', () => {
+  it('should handle multiple commands in sequence and capture output', () => {
     const commands = [
       'echo "First Command"',
       'echo "Second Command"',
       'echo "Third Command"'
     ];
-    commands.forEach(command => runCommand(command));
     commands.forEach(command => {
+      const output = execSync(command, { shell: '/bin/bash' }).toString().trim();
+      runCommand(command);
       expect(logs).toContain(kleur.cyan(`Running: ${command}`));
+      expect(logs.some(log => log.includes(output))).toBe(true);
     });
-    console.log = originalLog;
   });
 });
