@@ -6,6 +6,7 @@
     "create-my-app": "main.js"
   },
   "scripts": {
+    "test:unit": "jest test/command.test.js",
     "test:e2e": "jest test/e2e.test.js"
   },
   "keywords": [],
