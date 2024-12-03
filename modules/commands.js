@@ -4,8 +4,8 @@ const kleur = require('kleur');
 const runCommand = (command) => {
   try {
     console.log(kleur.cyan(`Running: ${command}`));
-    execSync(command, { stdio: 'inherit', env: { ...process.env }, shell: '/bin/bash' });
-    console.log('\n');
+    const output = execSync(command, { encoding: 'utf-8', shell: '/bin/bash' });
+    console.log(output.trim());
   } catch (error) {
     console.error(kleur.red(`Failed to execute command: ${command}`));
     console.error(kleur.red(error.message));

@@ -6,8 +6,9 @@
     "create-my-app": "main.js"
   },
   "scripts": {
+    "test": "jest",
     "test:unit": "jest test/unit/*",
-    "test:unit:debug": "pnpm run test:unit -- --silent=false --watch",
+    "test:unit:debug": "jest test/unit/* --silent=false --watch",
     "test:e2e": "jest test/e2e.test.js"
   },
   "keywords": [],
