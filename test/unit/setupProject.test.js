@@ -6,7 +6,6 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-jest.mock('fs');
 jest.mock('kleur', () => ({
   cyan: jest.fn((text) => text),
   red: jest.fn((text) => text),
@@ -17,31 +16,52 @@ jest.mock('kleur', () => ({
 jest.mock('../../modules/commands');
 jest.mock('../../modules/fileOperations');
 
-describe('setupProject', () => {
+describe('setupProject Integration Test', () => {
   let tmpDir;
   let appName;
+  const originalDir = process.cwd();
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-    tmpDir = path.join(os.tmpdir(), `testApp-${Date.now()}`);
+  beforeAll(() => {
+    tmpDir = path.join(os.tmpdir(), `integrationTest-${Date.now()}`);
     appName = path.join(tmpDir, 'testApp');
-    fs.mkdirSync(appName);
 
-    console.log({ appName });
-    // Mock behavior for fs.existsSync to correctly handle the temporary directory and testApp
-    fs.existsSync.mockImplementation((dir) => {
-      return dir === tmpDir || dir === appName; // Only the temporary directory exists by default
-    });
+    // Create the tmpDir using the real implementation
+    fs.mkdirSync(tmpDir, { recursive: true });
+    console.log('Temporary directory created:', tmpDir);
+
+    // Check if the tmpDir exists
+    if (!fs.existsSync(tmpDir)) {
+      throw new Error(`Temporary directory ${tmpDir} was not created.`);
+    }
+
+    // Change the working directory to the temporary directory
+    process.chdir(tmpDir);
+    console.log('Current working directory:', process.cwd());
   });
 
-  afterEach(() => {
+  afterAll(() => {
+    // Revert to the original working directory
+    process.chdir(originalDir);
+
     if (fs.existsSync(tmpDir)) {
       fs.rmSync(tmpDir, { recursive: true, force: true });
+      console.log('Temporary directory removed:', tmpDir);
     }
   });
 
-  it('should simply run', () => {
-    expect(5).toEqual(5);
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.spyOn(fs, 'mkdirSync');
+    jest.spyOn(fs, 'existsSync');
+    jest.spyOn(fs, 'rmSync');
+    jest.spyOn(fs, 'unlinkSync');
+  });
+  afterEach(() => {
+    // Restore the original fs methods
+    fs.mkdirSync.mockRestore();
+    fs.existsSync.mockRestore();
+    fs.rmSync.mockRestore();
+    fs.unlinkSync.mockRestore();
   });
 
   it('should check for package manager version and install if not found', async () => {
@@ -53,39 +73,32 @@ describe('setupProject', () => {
     expect(runCommand).toHaveBeenCalledWith('npm --version');
     expect(runCommand).toHaveBeenCalledWith('npm install -g npm');
   });
-
-  fit('should create the application directory', async () => {
-    // Set fs.existsSync to return false for appName
-    fs.existsSync.mockImplementation((dir) => dir === tmpDir);
-
+  it('should create the application directory', async () => {
     await setupProject(tmpDir, 'testApp', 'npm', 'myScript');
 
-    expect(fs.mkdirSync).toHaveBeenCalledWith(appName);
+    // Check that the directory was created
+    expect(fs.mkdirSync).toHaveBeenCalledWith('testApp');
+    expect(fs.existsSync(appName)).toBe(true);
   });
-  
-
   it('should copy files to the application directory', async () => {
     await setupProject(tmpDir, 'testApp', 'npm', 'myScript');
 
-    expect(copyRecursiveSync).toHaveBeenCalledWith('/base/app/dir', path.join(tmpDir, 'testApp'), 'myScript', expect.any(Function));
+    expect(copyRecursiveSync).toHaveBeenCalledWith(tmpDir, 'testApp', 'myScript', expect.any(Function));
   });
-
   it('should handle removing lock files based on package manager', async () => {
-    fs.existsSync.mockReturnValueOnce(true); // Mock pnpm-lock.yaml existence
-    fs.unlinkSync.mockImplementation(() => {}); // Mock unlink operation
+    fs.existsSync.mockImplementation((file) => file === 'pnpm-lock.yaml');
 
     await setupProject(tmpDir, 'testApp', 'npm', 'myScript');
 
-    expect(fs.unlinkSync).toHaveBeenCalledWith(path.join(tmpDir, 'testApp/pnpm-lock.yaml'));
-    expect(fs.unlinkSync).not.toHaveBeenCalledWith(path.join(tmpDir, 'testApp/package-lock.json'));
+    expect(fs.unlinkSync).toHaveBeenCalledWith('pnpm-lock.yaml');
+    expect(fs.unlinkSync).not.toHaveBeenCalledWith('package-lock.json');
 
-    fs.existsSync.mockReturnValueOnce(true); // Mock package-lock.json existence
+    fs.existsSync.mockImplementation((file) => file === 'package-lock.json');
 
     await setupProject(tmpDir, 'testApp', 'pnpm', 'myScript');
 
-    expect(fs.unlinkSync).toHaveBeenCalledWith(path.join(tmpDir, 'testApp/package-lock.json'));
+    expect(fs.unlinkSync).toHaveBeenCalledWith('package-lock.json');
   });
-
   it('should execute the appropriate commands for project setup', async () => {
     await setupProject(tmpDir, 'testApp', 'npm', 'myScript');
 
