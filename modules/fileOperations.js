@@ -9,7 +9,6 @@ const copyRecursiveSync = (src, dest, scriptName, shouldIgnore) => {
   for (let entry of entries) {
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
-    const relativeSrcPath = path.relative(process.cwd(), srcPath);
     const shortSrcPath = path.basename(srcPath); // Use basename for shorter logs
     console.log(`Processing: ${shortSrcPath}`);  // Log with shorter path
     if (entry.name !== scriptName && !shouldIgnore(entry.name)) {
