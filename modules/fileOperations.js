@@ -10,10 +10,11 @@ const copyRecursiveSync = (src, dest, scriptName, shouldIgnore) => {
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
     const relativeSrcPath = path.relative(process.cwd(), srcPath);
-    console.log(`Processing: ${relativeSrcPath}`);  // Debug log with relative path
+    const shortSrcPath = path.basename(srcPath); // Use basename for shorter logs
+    console.log(`Processing: ${shortSrcPath}`);  // Log with shorter path
     if (entry.name !== scriptName && !shouldIgnore(entry.name)) {
       entry.isDirectory() ? copyRecursiveSync(srcPath, destPath, scriptName, shouldIgnore) : fs.copyFileSync(srcPath, destPath);
-      console.log(`Copied: ${relativeSrcPath}`);
+      console.log(`Copied: ${shortSrcPath}`);
     }
   }
 
@@ -32,6 +33,5 @@ const shouldIgnore = (name, defaultIgnores) => {
     return pattern.test(name);
   });
 };
-
 
 module.exports = { copyRecursiveSync, shouldIgnore };
