@@ -27,7 +27,11 @@ const copyRecursiveSync = (src, dest, scriptName, shouldIgnore) => {
 };
 
 const shouldIgnore = (name, defaultIgnores) => {
-  return defaultIgnores.some(ignore => name.startsWith(ignore.replace('*', '')));
+  return defaultIgnores.some(ignore => {
+    const pattern = new RegExp(ignore.replace(/\*/g, '.*'));
+    return pattern.test(name);
+  });
 };
+
 
 module.exports = { copyRecursiveSync, shouldIgnore };

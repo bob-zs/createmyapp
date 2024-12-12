@@ -16,7 +16,8 @@ const setupProject = async (baseAppDir, appName, packageManager, scriptName) => 
   fs.mkdirSync(appName);
   console.log(kleur.cyan('Setting up files for the application...'));
 
-  copyRecursiveSync(baseAppDir, appName, scriptName, name => shouldIgnore(name, defaultIgnores));
+  console.log('HERE', { scriptName });
+  copyRecursiveSync(baseAppDir, appName, scriptName, defaultIgnores));
   console.log('\n');
 
   process.chdir(appName);
