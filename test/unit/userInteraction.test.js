@@ -1,11 +1,22 @@
-const { render } = require('@inquirer/testing')
-const { promptUser } = require('../../modules/userInteraction');
+const inquirer = require('inquirer');
+const { promptUser } = require('../../modules/userInteraction'); // Adjust the path accordingly
 
-describe('userInteraction', () => {
-  it('runs', () => {
-    expect(true).toEqual(true);
-  });
-  it('should be tested', async () => {
+jest.mock('inquirer', () => ({
+  prompt: jest.fn(),
+}));
 
+describe('promptUser', () => {
+  it('should return the selected package manager', async () => {
+    // Mock the prompt method
+    inquirer.prompt.mockResolvedValue({ packageManager: 'pnpm' });
+
+    const result = await promptUser();
+    expect(result).toEqual({ packageManager: 'pnpm' });
+
+    // Test for another choice
+    inquirer.prompt.mockResolvedValue({ packageManager: 'npm' });
+
+    const result2 = await promptUser();
+    expect(result2).toEqual({ packageManager: 'npm' });
   });
 });
