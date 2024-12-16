@@ -1,38 +1,38 @@
 const inquirer = require('inquirer');
-const { promptUser } = require('../../modules/userInteraction'); // Adjust the path accordingly
+const { promptUser } = require('../../modules/userInteraction');
 
 jest.mock('inquirer');
 
-describe('promptUser function', () => {
-  beforeEach(() => {
-    jest.clearAllMocks(); // Ensure no residual mocks
+const mockPromptWithResponse = async (response) => {
+  inquirer.prompt = jest.fn().mockResolvedValue(response);
+  const result = await promptUser();
+  expect(result.packageManager).toBe(response.packageManager);
+  expect(inquirer.prompt).toHaveBeenCalledWith([
+    {
+      type: 'list',
+      name: 'packageManager',
+      message: 'Which package manager do you want to use?',
+      choices: ['pnpm', 'npm'],
+    },
+  ]);
+};
+
+describe('userInteraction', () => {
+  it('should allow users to select pnpm', async () => {
+    await mockPromptWithResponse({ packageManager: 'pnpm' });
   });
 
-  it('should return the selected package manager', async () => {
-    // Mock the prompt method
-    inquirer.prompt = jest.fn().mockResolvedValue({ packageManager: 'pnpm' });
+  it('should allow users to select npm', async () => {
+    await mockPromptWithResponse({ packageManager: 'npm' });
+  });
 
-    const result = await promptUser();
-    expect(result).toEqual({ packageManager: 'pnpm' });
+  it('should handle errors gracefully', async () => {
+    const mockPrompt = jest.fn().mockRejectedValue(new Error('Something went wrong'));
+    inquirer.prompt = mockPrompt;
 
-    // Verify the prompt was called with the expected arguments
-    expect(inquirer.prompt).toHaveBeenCalledWith([
-      {
-        type: 'list',
-        name: 'packageManager',
-        message: 'Which package manager do you want to use?',
-        choices: ['pnpm', 'npm'],
-      },
-    ]);
+    await expect(promptUser()).rejects.toThrow('Something went wrong');
 
-    // Test for another choice
-    inquirer.prompt.mockResolvedValue({ packageManager: 'npm' });
-
-    const result2 = await promptUser();
-    expect(result2).toEqual({ packageManager: 'npm' });
-
-    // Verify the prompt was called again with the expected arguments
-    expect(inquirer.prompt).toHaveBeenCalledWith([
+    expect(mockPrompt).toHaveBeenCalledWith([
       {
         type: 'list',
         name: 'packageManager',
