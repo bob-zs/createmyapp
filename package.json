@@ -8,7 +8,7 @@
   "scripts": {
     "test": "jest",
     "test:unit": "jest ./test/unit/*",
-    "test:unit:single": "jest ./test/unit/userInteraction --silent=false --watch",
+    "test:unit:single": "jest ./test/unit/setupProject --silent=false --watch",
     "test:unit:debug": "jest ./test/unit/* --silent=false --watch",
     "test:e2e": "jest ./test/e2e.test.js"
   },
