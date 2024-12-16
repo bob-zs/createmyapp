@@ -80,4 +80,58 @@ describe('setupProject', () => {
 
     expect(fs.unlinkSync).toHaveBeenCalledWith('package-lock.json');
   });
+
+  it('should handle errors during project setup', async () => {
+    fs.mkdirSync.mockImplementation(() => { throw new Error('Failed to create directory'); });
+    
+    await expect(setupProject(baseAppDir, appName, packageManager, scriptName)).rejects.toThrow('Failed to create directory');
+
+    expect(fs.mkdirSync).toHaveBeenCalledWith(appName);
+
+    // Reset the mock implementation for subsequent tests
+    fs.mkdirSync.mockReset();
+    fs.mkdirSync.mockImplementation(() => {});
+  });
+
+  it('should setup project with yarn as package manager', async () => {
+    await setupProject(baseAppDir, appName, 'yarn', scriptName);
+
+    expect(runCommand).toHaveBeenCalledWith('yarn install');
+    expect(runCommand).toHaveBeenCalledWith('yarn exec webpack --mode="development"');
+  });
+
+  it('should setup project with pnpm as package manager', async () => {
+    await setupProject(baseAppDir, appName, 'pnpm', scriptName);
+
+    expect(runCommand).toHaveBeenCalledWith('pnpm install');
+    expect(runCommand).toHaveBeenCalledWith('pnpm exec webpack --mode="development"');
+  });
+
+  it('should use custom ignore list', async () => {
+    const customIgnores = ['.env', 'logs'];
+
+    // Mock implementation to use this custom ignore
+    copyRecursiveSync.mockImplementation(() => {});
+
+    await setupProject(baseAppDir, appName, packageManager, scriptName);
+
+    expect(copyRecursiveSync).toHaveBeenCalledWith(baseAppDir, appName, scriptName, expect.any(Array));
+  });
+
+  it('should display formatted messages with kleur', async () => {
+    await setupProject(baseAppDir, appName, packageManager, scriptName);
+
+    expect(kleur.cyan).toHaveBeenCalledWith('Setting up files for the application...');
+    expect(kleur.green).toHaveBeenCalledWith('\nExpress app setup complete with custom configurations!');
+    expect(kleur.yellow).toHaveBeenCalledWith('Run the following command to start the server:\n');
+    expect(kleur.blue).toHaveBeenCalledWith(`cd ${appName} && ${packageManager} run start:dev\n`);
+  });
+
+  it('should run git commands during setup', async () => {
+    await setupProject(baseAppDir, appName, packageManager, scriptName);
+
+    expect(runCommand).toHaveBeenCalledWith('git init');
+    expect(runCommand).toHaveBeenCalledWith('git add .');
+    expect(runCommand).toHaveBeenCalledWith(`git commit -m "Initial commit from create-my-app for ${appName}"`);
+  });
 });
