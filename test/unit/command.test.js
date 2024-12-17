@@ -6,6 +6,7 @@ describe('runCommand', () => {
   let execSyncMock;
   let consoleLogMock;
   let consoleErrorMock;
+  let stderrWriteMock;
 
   beforeEach(() => {
     // Mock execSync to control its behavior
@@ -14,6 +15,9 @@ describe('runCommand', () => {
     // Mock console methods to verify output
     consoleLogMock = jest.spyOn(console, 'log').mockImplementation(() => {});
     consoleErrorMock = jest.spyOn(console, 'error').mockImplementation(() => {});
+    
+    // Mock process.stderr.write to suppress stderr output
+    stderrWriteMock = jest.spyOn(process.stderr, 'write').mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -21,6 +25,7 @@ describe('runCommand', () => {
     execSyncMock.mockRestore();
     consoleLogMock.mockRestore();
     consoleErrorMock.mockRestore();
+    stderrWriteMock.mockRestore();
   });
 
   it('should log the running command and its output if successful', () => {
