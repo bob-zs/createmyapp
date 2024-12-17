@@ -30,12 +30,11 @@ module.exports = async () => {
   }
 
   let packageManager = process.env.PACKAGE_MANAGER;
-  if (!packageManager) {
-    const response = await promptUser();
-    packageManager = response.packageManager;
-  }
-
   try {
+    if (!packageManager) {
+      const response = await promptUser();
+      packageManager = response.packageManager;
+    }
     await setupProject(baseAppDir, appName, packageManager, scriptName);
   } catch (error) {
     if (error.name === 'ExitPromptError') {
