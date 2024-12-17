@@ -1,10 +1,7 @@
 const inquirer = require('inquirer');
 
-// Check if inquirer has a default export and adjust accordingly
-const prompt = inquirer.default.prompt;
-
 const promptUser = async () => {
-  const { packageManager } = await prompt([
+  const { packageManager } = await inquirer.default.prompt([
     {
       type: 'list',
       name: 'packageManager',

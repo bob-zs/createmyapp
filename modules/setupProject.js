@@ -1,4 +1,4 @@
-const { copyRecursiveSync, shouldIgnore } = require('./fileOperations.js');
+const { copyRecursiveSync } = require('./fileOperations.js');
 const { runCommand } = require('./commands.js');
 const kleur = require('kleur');
 const fs = require('node:fs');
@@ -16,8 +16,7 @@ const setupProject = async (baseAppDir, appName, packageManager, scriptName) => 
   fs.mkdirSync(appName);
   console.log(kleur.cyan('Setting up files for the application...'));
 
-  copyRecursiveSync(baseAppDir, appName, scriptName, name => shouldIgnore(name, defaultIgnores));
-  console.log('\n');
+  copyRecursiveSync(baseAppDir, appName, scriptName, defaultIgnores);
 
   process.chdir(appName);
 

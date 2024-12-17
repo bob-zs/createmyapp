@@ -1,3 +1,7 @@
+// How to Test a Node.js Command-Line Tool
+// https://javascript.plainenglish.io/how-to-test-a-node-js-command-line-tool-2735ea7dc041
+// try it out later
+
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
