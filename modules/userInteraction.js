@@ -1,7 +1,7 @@
 const inquirer = require('inquirer');
 
 const promptUser = async () => {
-  const { packageManager } = await inquirer.prompt([
+  const { packageManager } = await inquirer.default.prompt([
     {
       type: 'list',
       name: 'packageManager',
